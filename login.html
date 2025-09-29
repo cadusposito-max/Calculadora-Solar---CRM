@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="bg-gray-900 flex flex-col items-center justify-center min-h-screen text-gray-100 px-4">
+
+  <div class="bg-gray-800 p-8 rounded-xl shadow-lg w-full max-w-md border border-gray-700">
+    
+    <div id="login-view">
+      <h1 class="text-2xl font-bold text-center mb-6 text-white">Acessar sua Conta</h1>
+      <form id="login-form" class="space-y-4">
+        <div class="relative">
+          <i class='bx bx-envelope absolute left-3 top-1/2 -translate-y-1/2 text-gray-400'></i>
+          <input type="email" id="login-email" placeholder="E-mail" required
+            class="w-full p-3 pl-10 rounded bg-gray-700 border border-gray-600 focus:border-amber-500 focus:ring-amber-500 transition-colors" />
+        </div>
+        <div class="relative">
+          <i class='bx bx-lock-alt absolute left-3 top-1/2 -translate-y-1/2 text-gray-400'></i>
+          <input type="password" id="login-pass" placeholder="Senha" required
+            class="w-full p-3 pl-10 rounded bg-gray-700 border border-gray-600 focus:border-amber-500 focus:ring-amber-500 transition-colors" />
+        </div>
+        <button type="submit" class="w-full cta-button amber">Entrar</button>
+      </form>
+      <p class="text-center mt-6 text-sm text-gray-400">
+        Não tem uma conta? <a href="#" id="show-signup"
+          class="font-semibold text-amber-400 hover:text-amber-300">Cadastre-se</a>
+      </p>
+      <div class="text-center mt-4">
+        <a href="index.html"
+          class="text-sm text-gray-500 hover:text-amber-400 transition-colors inline-flex items-center">
+          <i class='bx bx-left-arrow-alt mr-1'></i>
+          Voltar para a Home
+        </a>
+      </div>
+    </div>
+
+    <div id="signup-view" class="hidden">
+      <h1 class="text-2xl font-bold text-center mb-6 text-white">Criar Nova Conta</h1>
+      <form id="signup-form" class="space-y-4">
+        <div class="relative">
+          <i class='bx bx-envelope absolute left-3 top-1/2 -translate-y-1/2 text-gray-400'></i>
+          <input type="email" id="signup-email" placeholder="Seu melhor e-mail" required
+            class="w-full p-3 pl-10 rounded bg-gray-700 border border-gray-600 focus:border-green-500 focus:ring-green-500 transition-colors" />
+        </div>
+        <div class="relative">
+          <i class='bx bx-lock-alt absolute left-3 top-1/2 -translate-y-1/2 text-gray-400'></i>
+          <input type="password" id="signup-pass" placeholder="Crie uma senha forte" required
+            class="w-full p-3 pl-10 rounded bg-gray-700 border border-gray-600 focus:border-green-500 focus:ring-green-500 transition-colors" />
+        </div>
+        <button type="submit" class="w-full cta-button green">Criar Conta</button>
+      </form>
+      <p class="text-center mt-6 text-sm text-gray-400">
+        Já tem uma conta? <a href="#" id="show-login" class="font-semibold text-amber-400 hover:text-amber-300">Entrar</a>
+      </p>
+    </div>
+
+  </div> <p id="msg" class="text-center mt-4 text-sm text-amber-400 h-4"></p>
+
+  <script>
+    const SUPABASE_URL = "https://uhofnzijvikcgicdkphz.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVob2ZuemlqdmlrY2dpY2RrcGh6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg4MzA2OTAsImV4cCI6MjA3NDQwNjY5MH0.s0x31vAorKqMMtp149a2GndlNPNTuV52TRsCt4X7yVg";
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const msg = document.getElementById("msg");
+    const loginView = document.getElementById("login-view");
+    const signupView = document.getElementById("signup-view");
+    const showSignup = document.getElementById("show-signup");
+    const showLogin = document.getElementById("show-login");
+
+    // Lógica para alternar entre os formulários
+    showSignup.addEventListener("click", (e) => {
+      e.preventDefault();
+      loginView.classList.add("hidden");
+      signupView.classList.remove("hidden");
+      msg.textContent = "";
+    });
+
+    showLogin.addEventListener("click", (e) => {
+      e.preventDefault();
+      signupView.classList.add("hidden");
+      loginView.classList.remove("hidden");
+      msg.textContent = "";
+    });
+
+    // Lógica do Supabase (sem alterações)
+    document.getElementById("login-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email = document.getElementById("login-email").value;
+      const password = document.getElementById("login-pass").value;
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) msg.textContent = "E-mail ou senha inválidos.";
+      else window.location.href = "dashboard.html";
+    });
+
+    document.getElementById("signup-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email = document.getElementById("signup-email").value;
+      const password = document.getElementById("signup-pass").value;
+      const { error } = await supabase.auth.signUp({ email, password });
+      msg.textContent = error ? error.message : "Cadastro realizado! Verifique seu e-mail para confirmar.";
+    });
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Detalhes do Projeto - Calculadora Solar</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="bg-gray-900 text-gray-100 min-h-screen flex flex-col">
+
+  <header class="bg-gray-900/80 backdrop-blur-sm z-50 border-b border-gray-700">
+    <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+      <a href="index.html" class="flex items-center text-amber-400 hover:opacity-80 transition-opacity">
+        <i class='bx bxs-calculator text-3xl mr-2'></i>
+        <span class="text-2xl font-bold text-white">Calculadora Solar</span>
+      </a>
+      <div class="flex items-center space-x-4">
+        <span id="user-email" class="text-sm text-gray-400 hidden sm:block"></span>
+        <button id="logout" class="cta-button outline-amber text-sm py-2 px-4 flex items-center">
+          <i class='bx bx-log-out text-lg mr-2'></i>
+          Sair
+        </button>
+      </div>
+    </nav>
+  </header>
+
+  <main class="flex-grow container mx-auto p-6">
+    <div class="w-full max-w-5xl mx-auto space-y-8">
+      <div class="flex justify-between items-center my-8">
+        <a href="dashboard.html" class="text-gray-300 hover:text-amber-400 transition-colors text-sm flex items-center">
+          <i class='bx bx-arrow-back mr-2'></i> Voltar para a Lista de Projetos
+        </a>
+        <div class="flex gap-4">
+          <button id="save-details-button" class="cta-button green"><i class='bx bxs-save mr-2'></i> Salvar
+            Alterações</button>
+          <a id="detail-calculator-link" href="#" class="cta-button amber"><i class='bx bx-calculator mr-2'></i> Abrir
+            na Calculadora</a>
+        </div>
+      </div>
+
+      <form id="details-form">
+        <div class="bg-gray-800 p-6 rounded-lg border border-gray-700 mb-8">
+          <h2 id="detail-project-name" class="text-2xl font-bold text-white mb-6">Carregando...</h2>
+          <div class="mb-6">
+            <label for="form-nome_projeto" class="block text-sm font-medium text-gray-400 mb-2">Nome do Projeto</label>
+            <input type="text" id="form-nome_projeto" placeholder="Digite o nome do projeto"
+              class="w-full bg-gray-700 p-2 rounded border border-gray-600 focus:border-amber-500 focus:ring-amber-500 transition-colors">
+          </div>
+          <div class="mb-4">
+            <span class="text-sm font-bold text-gray-400">Tipo de Cliente</span>
+            <div class="flex gap-4 mt-2">
+              <label class="flex items-center"><input type="radio" name="tipo_cliente" value="PF" class="mr-2"> Pessoa
+                Física</label>
+              <label class="flex items-center"><input type="radio" name="tipo_cliente" value="PJ" class="mr-2"> Pessoa
+                Jurídica</label>
+            </div>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <input type="text" id="form-nome_cliente" placeholder="Nome do Cliente"
+              class="bg-gray-700 p-2 rounded border border-gray-600">
+            <div id="pf-fields">
+              <input type="text" id="form-cpf_cnpj_pf" placeholder="CPF"
+                class="bg-gray-700 p-2 rounded border border-gray-600 w-full">
+            </div>
+            <div id="pj-fields" class="hidden">
+              <input type="text" id="form-cpf_cnpj_pj" placeholder="CNPJ"
+                class="bg-gray-700 p-2 rounded border border-gray-600 w-full">
+            </div>
+            <input type="email" id="form-email" placeholder="Email de Contato"
+              class="bg-gray-700 p-2 rounded border border-gray-600">
+            <input type="text" id="form-telefone" placeholder="Telefone"
+              class="bg-gray-700 p-2 rounded border border-gray-600">
+            <input type="text" id="form-endereco" placeholder="Endereço da Instalação"
+              class="bg-gray-700 p-2 rounded border border-gray-600 md:col-span-2">
+          </div>
+        </div>
+
+        <div class="bg-gray-800 p-6 rounded-lg border border-gray-700 mb-8">
+          <h2 class="text-2xl font-bold text-white mb-6">Dados Iniciais do Sistema</h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <input type="number" id="form-moduleCount" placeholder="Qtd. Módulos"
+              class="bg-gray-700 p-2 rounded border border-gray-600">
+            <input type="number" id="form-modulePower" placeholder="Potência do Módulo (Wp)"
+              class="bg-gray-700 p-2 rounded border border-gray-600">
+            <input type="number" id="form-irradiation" step="0.01" placeholder="Irradiação Solar"
+              class="bg-gray-700 p-2 rounded border border-gray-600">
+            <input type="number" id="form-systemLosses" placeholder="Perdas do Sistema (%)"
+              class="bg-gray-700 p-2 rounded border border-gray-600">
+          </div>
+        </div>
+      </form>
+
+      <div class="bg-gray-800 p-6 rounded-lg border border-gray-700">
+        <h2 class="text-2xl font-bold text-white mb-4">Documentos do Projeto</h2>
+        <div class="flex items-center gap-4 mb-6">
+          <input type="file" id="file-upload"
+            class="block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-amber-500 file:text-amber-900 hover:file:bg-amber-400" />
+          <button id="upload-button" class="cta-button green flex-shrink-0"><i class='bx bx-upload mr-2'></i>
+            Enviar</button>
+        </div>
+        <div id="file-list" class="space-y-2"></div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const SUPABASE_URL = "https://uhofnzijvikcgicdkphz.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVob2ZuemlqdmlrY2dpY2RrcGh6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg4MzA2OTAsImV4cCI6MjA3NDQwNjY5MH0.s0x31vAorKqMMtp149a2GndlNPNTuV52TRsCt4X7yVg";
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    let currentProjectId = null;
+    const saveButton = document.getElementById('save-details-button');
+
+    document.addEventListener('DOMContentLoaded', () => {
+      checkUser();
+      const urlParams = new URLSearchParams(window.location.search);
+      const projectId = urlParams.get('id');
+
+      if (!projectId) {
+        alert("ID do projeto não encontrado. Redirecionando...");
+        window.location.href = 'dashboard.html';
+        return;
+      }
+      currentProjectId = projectId;
+      loadProjectDetails(projectId);
+    });
+
+    async function checkUser() {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) window.location.href = "login.html";
+      else document.getElementById("user-email").textContent = user.email;
+    }
+
+    document.getElementById("logout").addEventListener("click", async () => {
+      await supabase.auth.signOut();
+      window.location.href = "login.html";
+    });
+
+    async function loadProjectDetails(projectId) {
+      const { data, error } = await supabase.from('calculos_salvos').select('*').eq('id', projectId).single();
+      if (error || !data) {
+        alert("Projeto não encontrado ou você não tem permissão para vê-lo.");
+        window.location.href = 'dashboard.html';
+        return;
+      }
+      document.getElementById('detail-project-name').innerText = data.nome_projeto || 'Projeto sem nome';
+      document.getElementById('form-nome_projeto').value = data.nome_projeto || '';
+      document.getElementById('detail-calculator-link').href = `calculadora.html?id=${projectId}`;
+      document.querySelector(`input[name="tipo_cliente"][value="${data.tipo_cliente || 'PF'}"]`).checked = true;
+      toggleClientFields();
+      document.getElementById('form-nome_cliente').value = data.nome_cliente || '';
+      if (data.tipo_cliente === 'PJ') document.getElementById('form-cpf_cnpj_pj').value = data.cpf_cnpj || '';
+      else document.getElementById('form-cpf_cnpj_pf').value = data.cpf_cnpj || '';
+      document.getElementById('form-email').value = data.email || '';
+      document.getElementById('form-telefone').value = data.telefone || '';
+      document.getElementById('form-endereco').value = data.endereco || '';
+
+      if (data.dados_completos) {
+        document.getElementById('form-moduleCount').value = data.dados_completos.moduleCount || '';
+        document.getElementById('form-modulePower').value = data.dados_completos.modulePower || '';
+        document.getElementById('form-irradiation').value = data.dados_completos.irradiation || '';
+        document.getElementById('form-systemLosses').value = data.dados_completos.systemLosses || '';
+      }
+      loadProjectFiles(projectId);
+    }
+
+    saveButton.addEventListener('click', async (event) => {
+      event.preventDefault();
+      await saveDetails();
+    });
+
+    async function saveDetails() {
+      if (!currentProjectId) {
+        alert("Erro: ID do projeto não encontrado.");
+        return;
+      }
+
+      const originalButtonText = saveButton.innerHTML;
+      saveButton.disabled = true;
+      saveButton.innerHTML = `<i class='bx bx-loader-alt animate-spin mr-2'></i> Salvando...`;
+
+      try {
+        const tipo_cliente = document.querySelector('input[name="tipo_cliente"]:checked').value;
+        const nome_cliente = document.getElementById('form-nome_cliente').value;
+        const cpf_cnpj = (tipo_cliente === 'PF') ? document.getElementById('form-cpf_cnpj_pf').value : document.getElementById('form-cpf_cnpj_pj').value;
+        const email = document.getElementById('form-email').value;
+        const telefone = document.getElementById('form-telefone').value;
+        const endereco = document.getElementById('form-endereco').value;
+        const moduleCount = parseInt(document.getElementById('form-moduleCount').value) || 0;
+        const modulePower = parseInt(document.getElementById('form-modulePower').value) || 0;
+        const irradiation = parseFloat(document.getElementById('form-irradiation').value.replace(',', '.')) || 0;
+        const systemLosses = parseFloat(document.getElementById('form-systemLosses').value.replace(',', '.')) || 0;
+        const potencia_pico_kwp = (moduleCount * modulePower) / 1000;
+        const performanceRatio = 1 - (systemLosses / 100);
+        const geracao_media_kwh = (potencia_pico_kwp * irradiation * 30.4) * performanceRatio;
+
+        const { data: oldData } = await supabase.from('calculos_salvos').select('dados_completos').eq('id', currentProjectId).single();
+        const oldDadosCompletos = oldData ? oldData.dados_completos : {};
+
+        const updateData = {
+          nome_projeto: document.getElementById('form-nome_projeto').value, // <-- LINHA ADICIONADA
+          tipo_cliente, nome_cliente, cpf_cnpj, email, telefone, endereco, potencia_pico_kwp, geracao_media_kwh, total_modulos: moduleCount,
+          dados_completos: { ...oldDadosCompletos, moduleCount, modulePower, irradiation, systemLosses }
+        };
+        document.getElementById('detail-project-name').innerText = updateData.nome_projeto;
+        const { error } = await supabase.from('calculos_salvos').update(updateData).eq('id', currentProjectId);
+
+        if (error) {
+          alert("Erro ao salvar: " + error.message);
+        } else {
+          alert("Alterações salvas com sucesso!");
+        }
+
+      } catch (e) {
+        alert("Ocorreu um erro inesperado ao salvar.");
+        console.error(e);
+      } finally {
+        saveButton.disabled = false;
+        saveButton.innerHTML = originalButtonText;
+      }
+    }
+
+    const clientTypeRadios = document.querySelectorAll('input[name="tipo_cliente"]');
+    function toggleClientFields() {
+      const selectedType = document.querySelector('input[name="tipo_cliente"]:checked').value;
+      document.getElementById('pf-fields').classList.toggle('hidden', selectedType !== 'PF');
+      document.getElementById('pj-fields').classList.toggle('hidden', selectedType !== 'PJ');
+    }
+    clientTypeRadios.forEach(radio => radio.addEventListener('change', toggleClientFields));
+
+    // --- LÓGICA DE ARQUIVOS (AGORA COMPLETA) ---
+    const fileInput = document.getElementById('file-upload');
+    const uploadButton = document.getElementById('upload-button');
+
+    async function loadProjectFiles(projectId) {
+      const fileListDiv = document.getElementById('file-list');
+      fileListDiv.innerHTML = '<p class="text-gray-400">Carregando arquivos...</p>';
+      const { data: fileList, error: listError } = await supabase.storage.from('documentos_projetos').list(projectId);
+
+      if (listError || !fileList || fileList.length === 0) {
+        fileListDiv.innerHTML = '<p class="text-gray-500">Nenhum documento anexado.</p>';
+        return;
+      }
+
+      const fileItems = await Promise.all(fileList.map(async (file) => {
+        const { data } = await supabase.storage.from('documentos_projetos').createSignedUrl(`${projectId}/${file.name}`, 3600);
+        if (!data) return '';
+        const signedUrl = data.signedUrl;
+        const filePath = `${projectId}/${file.name}`;
+        return `
+            <div class="flex justify-between items-center p-3 bg-gray-700/50 rounded-lg hover:bg-gray-700 transition-colors">
+                <div class="flex items-center flex-grow min-w-0"><i class='bx bxs-file text-xl text-gray-400 mr-3'></i><span class="text-white truncate pr-4">${file.name}</span></div>
+                <div class="flex items-center gap-3 flex-shrink-0">
+                    <a href="${signedUrl}" target="_blank" class="cta-button outline-amber text-xs py-1 px-3 flex items-center"><i class='bx bx-show-alt mr-1'></i> Preview</a>
+                    <button data-path="${filePath}" class="download-button text-gray-400 hover:text-amber-400 p-2 rounded-full transition-colors"><i class='bx bx-download text-xl'></i></button>
+                </div>
+            </div>`;
+      }));
+      fileListDiv.innerHTML = fileItems.join('');
+    }
+
+    uploadButton.addEventListener('click', async () => {
+      const file = fileInput.files[0];
+      if (!file) { alert("Selecione um arquivo."); return; }
+      if (!currentProjectId) { alert("ID do projeto não encontrado."); return; }
+      const filePath = `${currentProjectId}/${file.name}`;
+      uploadButton.disabled = true;
+      uploadButton.innerHTML = "Enviando...";
+      const { error } = await supabase.storage.from('documentos_projetos').upload(filePath, file, { upsert: true });
+      if (error) { alert("Erro ao enviar o arquivo: " + error.message); }
+      else { loadProjectFiles(currentProjectId); }
+      uploadButton.disabled = false;
+      uploadButton.innerHTML = "<i class='bx bx-upload mr-2'></i> Enviar";
+      fileInput.value = "";
+    });
+
+    document.getElementById('file-list').addEventListener('click', async (event) => {
+      const downloadButton = event.target.closest('.download-button');
+      if (downloadButton) {
+        const filePath = downloadButton.dataset.path;
+        if (!filePath) return;
+        downloadButton.disabled = true;
+        const icon = downloadButton.querySelector('i');
+        icon.className = 'bx bx-loader-alt animate-spin text-xl';
+        try {
+          const { data: blob, error } = await supabase.storage.from('documentos_projetos').download(filePath);
+          if (error) throw error;
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.style.display = 'none';
+          a.href = url;
+          a.download = filePath.split('/').pop();
+          document.body.appendChild(a);
+          a.click();
+          window.URL.revokeObjectURL(url);
+          document.body.removeChild(a);
+        } catch (error) {
+          alert("Erro ao baixar o arquivo: " + error.message);
+        } finally {
+          downloadButton.disabled = false;
+          icon.className = 'bx bx-download text-xl';
+        }
+      }
+    });
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,264 @@
+/* Arquivo: styles.css */
+
+/* Estilos da Seção Hero (Página Inicial) */
+.hero-com-fundo {
+    background-image:
+        linear-gradient(to right, rgba(17, 24, 39, 0.521), rgba(31, 41, 55, 0.85)),
+        url('fundo-hero.jpg');
+    background-size: cover;
+    background-position: center center;
+    background-attachment: fixed;
+}
+
+/* Estilos dos Cards de Funcionalidades (Página Inicial) */
+.feature-card {
+    transition: all 0.3s ease-in-out;
+}
+
+.feature-card:hover {
+    transform: translateY(-8px);
+    border-color: #f59e0b;
+    /* amber-500 */
+    box-shadow: 0 0 20px rgba(251, 191, 36, 0.5);
+}
+
+/* Estilos para o Contêiner Responsivo do Vídeo */
+.video-responsive {
+    position: relative;
+    padding-bottom: 56.25%;
+    height: 0;
+    overflow: hidden;
+    max-width: 100%;
+    background: #000;
+    border-radius: 0.5rem;
+}
+
+.video-responsive iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+/* Estilos para a Seção com Parallax e Fundo Translúcido */
+.parallax-section {
+    padding: 5rem 1.5rem;
+    background-image:
+        linear-gradient(to right, rgba(21, 26, 37, 0.801), rgba(31, 41, 55, 0.6)),
+        url('fundo.jpg');
+    background-size: cover;
+    background-position: center center;
+    background-attachment: fixed;
+}
+
+.glass-panel {
+    background-color: rgba(19, 31, 49, 0.76);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 1rem;
+    padding: 3rem;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+
+/* Estilo Base para Botões de Ação (CTA) */
+.cta-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    padding: 0.75rem 2rem;
+    border-radius: 0.5rem;
+    transition: all 0.3s ease-in-out;
+    text-align: center;
+    text-decoration: none;
+}
+
+.cta-button:hover {
+    transform: scale(1.05) translateY(-2px);
+}
+
+/* Variação Amarela (Âmbar) */
+.cta-button.amber {
+    background-color: #f59e0b;
+    color: #1f2937;
+}
+
+.cta-button.amber:hover {
+    box-shadow: 0 0 20px rgba(251, 191, 36, 0.6), 0 0 40px rgba(245, 158, 11, 0.4);
+    background-color: #fbbf24;
+}
+
+/* Variação Verde */
+.cta-button.green {
+    background-color: #16a34a;
+    color: #fff;
+}
+
+.cta-button.green:hover {
+    color: #fff;
+    box-shadow: 0 0 20px rgba(34, 197, 94, 0.6), 0 0 40px rgba(22, 163, 74, 0.4);
+    background-color: #22c55e;
+}
+
+/* Variação Outline (apenas borda) */
+.cta-button.outline-amber {
+    background-color: transparent;
+    color: #f59e0b;
+    border: 2px solid #f59e0b;
+}
+
+.cta-button.outline-amber:hover {
+    background-color: #f59e0b;
+    color: #1f2937;
+    box-shadow: 0 0 20px rgba(251, 191, 36, 0.6), 0 0 40px rgba(245, 158, 11, 0.4);
+}
+
+/* Estilos para a barra de Feedback */
+.feedback-container {
+    overflow: hidden;
+    -webkit-mask-image: linear-gradient(to right, transparent, white 20%, white 80%, transparent);
+    mask-image: linear-gradient(to right, transparent, white 20%, white 80%, transparent);
+}
+
+.feedback-scroller {
+    display: flex;
+    gap: 1.5rem;
+    width: max-content;
+    animation: scroll 40s linear infinite;
+}
+
+.feedback-container:hover .feedback-scroller {
+    animation-play-state: paused;
+}
+
+.feedback-card {
+    background-color: rgba(31, 41, 55, 0.7);
+    border: 1px solid #4b5563;
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    width: 350px;
+    flex-shrink: 0;
+}
+
+@keyframes scroll {
+    from {
+        transform: translateX(0);
+    }
+
+    to {
+        transform: translateX(calc(-50% - 0.75rem));
+    }
+}
+
+/* Estilos para os Cards do Dashboard */
+.dashboard-card {
+    display: block;
+    background-color: #1f2937;
+    /* gray-800 */
+    padding: 2rem;
+    border-radius: 0.75rem;
+    border: 1px solid #374151;
+    /* gray-700 */
+    text-align: center;
+    transition: all 0.3s ease-in-out;
+    text-decoration: none;
+}
+
+.dashboard-card:hover {
+    transform: translateY(-8px);
+    border-color: #f59e0b;
+    /* amber-500 */
+    box-shadow: 0 0 25px rgba(251, 191, 36, 0.4);
+}
+
+/* Estilos para o background com grade (AutoCAD-like) */
+body {
+    /* Garante que o body ocupe toda a altura da tela para que o background seja visível */
+    min-height: 100vh;
+    background-color: #1a202c;
+    /* Um cinza escuro de base, se o body não tiver outro bg */
+    background-image:
+        /* Linhas horizontais */
+        linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+        /* Linhas verticais */
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+    background-size: 70px 70px;
+    /* Tamanho da célula da grade (30px x 30px) */
+    background-position: center center;
+    /* Centraliza a grade */
+    animation: moveGrid 30s linear infinite;
+}
+
+/* Arquivo: styles.css (adicionar no final) */
+
+/* Estilos para o Diagrama SVG */
+.diagram-box {
+    stroke: #9ca3af;
+    stroke-width: 1.5;
+    fill: #374151;
+}
+
+.diagram-text {
+    font-family: sans-serif;
+    fill: #e5e7eb;
+    font-size: 14px;
+}
+
+.diagram-line {
+    stroke: #f59e0b;
+    stroke-width: 2;
+}
+
+/* Estilos para Abas estilo "Chrome" */
+
+/* O contêiner que segura os botões das abas */
+.tabs-container {
+  border-bottom: 1px solid #374151; /* Cor gray-700, a linha principal */
+}
+
+/* Estilo base para todos os botões de aba */
+.tab-button-chrome {
+  padding: 0.75rem 1.5rem; /* Mais preenchimento interno */
+  border: 1px solid transparent; /* Borda transparente por padrão */
+  border-bottom: none; /* Nenhuma borda inferior no botão */
+  border-top-left-radius: 0.5rem; /* Canto superior esquerdo arredondado */
+  border-top-right-radius: 0.5rem; /* Canto superior direito arredondado */
+  transition: all 0.2s ease-in-out;
+}
+
+/* Estilo para a ABA ATIVA */
+.tab-active-chrome {
+  background-color: #1f2937; /* Cor gray-800, mesma cor do painel de conteúdo */
+  border-color: #374151; /* Cor gray-700 */
+  color: #f3f4f6; /* Cor gray-100 */
+  /* O truque para "conectar" a aba: margem negativa para cobrir a borda do contêiner */
+  margin-bottom: -1px; 
+}
+
+/* Estilo para a ABA INATIVA */
+.tab-inactive-chrome {
+  background-color: transparent;
+  color: #9ca3af; /* Cor gray-400 */
+}
+.tab-inactive-chrome:hover {
+  background-color: #374151; /* Cor gray-700, um leve destaque no hover */
+  color: #e5e7eb; /* Cor gray-200 */
+}
+
+
+/* ANIMAÇÃO DE BACKGROUND */
+@keyframes moveGrid {
+  from {
+    /* Posição inicial do fundo */
+    background-position: 0 0;
+  }
+  to {
+    /* Posição final. Usamos 70px porque é o mesmo tamanho da sua grade (background-size),
+       o que garante que a animação será um loop perfeito e sem "saltos". */
+    background-position: 70px 70px;
+  }
+}

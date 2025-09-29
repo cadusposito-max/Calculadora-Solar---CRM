@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora Solar</title>
+    <link rel="icon"
+        href="C:\Users\LENOVO\Desktop\Calculadora - Versão 0.1\Calculadora - Versão 0.2\Calculadora Solar/seu_icone.png"
+        type="image/png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="styles.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+</head>
+
+<body class="bg-gray-900 text-gray-200">
+
+    <header class="fixed top-0 left-0 w-full bg-gray-900/80 backdrop-blur-sm z-50 border-b border-gray-800">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="index.html" class="flex items-center text-amber-500">
+                <i class='bx bxs-calculator text-3xl mr-2'></i>
+                <span class="text-2xl font-bold text-white">Calculadora Solar</span>
+            </a>
+            <div class="flex items-center space-x-4">
+                <a href="login.html" class="cta-button amber text-sm py-2 px-4 flex items-center">
+                    <i class='bx bx-rocket text-lg mr-2'></i>
+                    Cadastrar
+                </a>
+                <a href="login.html" class="cta-button amber text-sm py-2 px-4 flex items-center">
+                    <i class='bx bx-user text-lg mr-2'></i>
+                    Login
+                </a>
+            </div>
+
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero-com-fundo relative text-center py-40 px-6 overflow-hidden">
+            <div class="relative z-10">
+                <h1 class="text-5xl md:text-6xl font-bold text-white mb-4">Sua Ferramenta Definitiva para Projetos
+                    Solares</h1>
+                <p class="text-xl text-gray-300 max-w-3xl mx-auto mb-8">
+                    Teste, valide e dimensione seus projetos fotovoltaicos com precisão profissional.
+                </p>
+                <a href="dashboard.html" class="cta-button amber text-lg">
+                    Iniciar Validação
+                </a>
+            </div>
+        </section>
+
+        <section class="py-20 bg-gray-900">
+            <div class="container mx-auto px-6">
+                <h2 class="text-4xl font-bold text-center text-white mb-12">Funcionalidades Principais</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <div class="feature-card bg-gray-800 p-8 rounded-lg border border-gray-700 text-center">
+                        <div class="text-amber-400 mb-4"><i class='bx bxs-rocket text-5xl'></i></div>
+                        <h3 class="text-2xl font-bold text-white mb-3">Agilidade</h3>
+                        <p class="text-gray-400">Calcule sistemas solares complexos em poucos minutos com rapidez e
+                            confiabilidade.</p>
+                    </div>
+                    <div class="feature-card bg-gray-800 p-8 rounded-lg border border-gray-700 text-center">
+                        <div class="text-amber-400 mb-4"><i class='bx bxs-file-pdf text-5xl'></i></div>
+                        <h3 class="text-2xl font-bold text-white mb-3">Relatórios Completos</h3>
+                        <p class="text-gray-400">Gere análises técnicas em PDF com diagramas, gráficos e todos os
+                            parâmetros de CC e CA.</p>
+                    </div>
+                    <div class="feature-card bg-gray-800 p-8 rounded-lg border border-gray-700 text-center">
+                        <div class="text-amber-400 mb-4"><i class='bx bx-target-lock text-5xl'></i></div>
+                        <h3 class="text-2xl font-bold text-white mb-3">Precisão Técnica</h3>
+                        <p class="text-gray-400">Validações confiáveis de tensão, corrente, overload e queda de tensão
+                            para projetos seguros.</p>
+                    </div>
+                    <div class="feature-card bg-gray-800 p-8 rounded-lg border border-gray-700 text-center">
+                        <div class="text-amber-400 mb-4"><i class='bx bxs-cog text-5xl'></i></div>
+                        <h3 class="text-2xl font-bold text-white mb-3">Flexibilidade</h3>
+                        <p class="text-gray-400">Ajuste todos os parâmetros, de múltiplos inversores e strings a tipos
+                            de disjuntores e cabos.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="parallax-section">
+            <div class="glass-panel container mx-auto px-6">
+                <h2 class="text-4xl font-bold text-center text-white mb-12">Para Quem é a Ferramenta?</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 text-center text-gray-300">
+                    <div class="p-6"><i class='bx bxs-hard-hat text-6xl text-amber-400'></i>
+                        <h3 class="text-xl font-bold mt-4 mb-2 text-white">Engenheiros Eletricistas</h3>
+                        <p class="text-gray-400">Para garantir que cada detalhe técnico do projeto esteja em
+                            conformidade e otimizado.</p>
+                    </div>
+                    <div class="p-6"><i class='bx bxs-user-pin text-6xl text-amber-400'></i>
+                        <h3 class="text-xl font-bold mt-4 mb-2 text-white">Integradores e Vendedores</h3>
+                        <p class="text-gray-400">Para criar propostas rápidas, precisas e gerar relatórios técnicos para
+                            apresentar aos clientes.</p>
+                    </div>
+                    <div class="p-6"><i class='bx bxs-wrench text-6xl text-amber-400'></i>
+                        <h3 class="text-xl font-bold mt-4 mb-2 text-white">Técnicos e Instaladores</h3>
+                        <p class="text-gray-400">Para validar em campo as configurações de arranjos, cabos e disjuntores
+                            de forma rápida.</p>
+                    </div>
+                    <div class="p-6"><i class='bx bxs-graduation text-6xl text-amber-400'></i>
+                        <h3 class="text-xl font-bold mt-4 mb-2 text-white">Estudantes e Entusiastas</h3>
+                        <p class="text-gray-400">Para aprender e simular projetos fotovoltaicos com uma ferramenta
+                            poderosa e intuitiva.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-20 bg-gray-900">
+            <div class="container mx-auto px-6 text-center">
+                <h2 class="text-4xl font-bold text-white mb-4">Veja a Calculadora em Ação</h2>
+                <p class="text-lg text-gray-400 max-w-2xl mx-auto mb-8">Descubra em poucos minutos como validar um
+                    projeto completo, desde os módulos até a conexão com a rede.</p>
+                <div class="mx-auto max-w-8x1 video-responsive shadow-lg">
+                    <iframe src="https://www.youtube.com/embed/1JKLM45aIik" frameborder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowfullscreen></iframe>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-20 bg-gray-900">
+            <div class="container mx-auto px-6">
+                <h2 class="text-4xl font-bold text-center text-white mb-12">O que os Profissionais Dizem</h2>
+                <div class="feedback-container">
+                    <div class="feedback-scroller">
+                        <div class="feedback-card">
+                            <div class="stars text-amber-400 text-xl mb-4"><i class='bx bxs-star'></i><i
+                                    class='bx bxs-star'></i><i class='bx bxs-star'></i><i class='bx bxs-star'></i><i
+                                    class='bx bxs-star'></i></div>
+                            <p class="text-gray-300 italic mb-4">"Essa calculadora economizou horas no meu processo de
+                                dimensionamento. A validação de múltiplos cenários é fantástica!"</p>
+                            <footer class="font-bold text-white">- João Silva, Engenheiro Eletricista</footer>
+                        </div>
+                        <div class="feedback-card">
+                            <div class="stars text-amber-400 text-xl mb-4"><i class='bx bxs-star'></i><i
+                                    class='bx bxs-star'></i><i class='bx bxs-star'></i><i class='bx bxs-star'></i><i
+                                    class='bx bxs-star-half'></i></div>
+                            <p class="text-gray-300 italic mb-4">"Finalmente uma ferramenta que entende as nuances do
+                                mercado brasileiro, com opções de disjuntores e cabos que realmente usamos."</p>
+                            <footer class="font-bold text-white">- Maria Oliveira, Integrador Solar</footer>
+                        </div>
+                        <div class="feedback-card">
+                            <div class="stars text-amber-400 text-xl mb-4"><i class='bx bxs-star'></i><i
+                                    class='bx bxs-star'></i><i class='bx bxs-star'></i><i class='bx bxs-star'></i><i
+                                    class='bx bxs-star'></i></div>
+                            <p class="text-gray-300 italic mb-4">"O diagrama SVG e o relatório em PDF são um diferencial
+                                enorme para apresentar propostas técnicas aos meus clientes."</p>
+                            <footer class="font-bold text-white">- Carlos Pereira, Vendedor Técnico</footer>
+                        </div>
+                        <div class="feedback-card">
+                            <div class="stars text-amber-400 text-xl mb-4"><i class='bx bxs-star'></i><i
+                                    class='bx bxs-star'></i><i class='bx bxs-star'></i><i class='bx bxs-star'></i><i
+                                    class='bx bxs-star'></i></div>
+                            <p class="text-gray-300 italic mb-4">"Indispensável para validar rapidamente os arranjos em
+                                campo. A análise de queda de tensão é a cereja do bolo."</p>
+                            <footer class="font-bold text-white">- Ana Costa, Técnica Instaladora</footer>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <section id="contact" class="py-20 bg-gray-800">
+            <div class="container mx-auto px-6 text-center">
+                <h2 class="text-4xl font-bold text-white mb-4">Pronto para Otimizar Seus Projetos?</h2>
+                <p class="text-lg text-gray-400 mb-8">Chega de planilhas complexas. Comece a usar a ferramenta mais
+                    completa do mercado.</p>
+                <a href="dashboard.html" class="cta-button amber text-sm py-2 px-4 items-center">
+                    <i class='bx bx-rocket text-lg mr-2'></i>
+                    Validar meu Projeto Agora
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <footer class="border-t border-gray-800">
+        <div
+            class="container mx-auto px-6 py-6 flex flex-col sm:flex-row justify-between items-center text-center text-gray-500">
+            <p class="mb-4 sm:mb-0">&copy; 2025 Direitos Reservados</p>
+            <a href="#contact" class="hover:text-amber-400 transition-colors">Contate-nos</a>
+        </div>
+    </footer>
+
+    <script>
+        const scrollers = document.querySelectorAll(".feedback-scroller");
+        if (scrollers.length > 0) {
+            const scrollerInner = scrollers[0];
+            const scrollerContent = Array.from(scrollerInner.children);
+            scrollerContent.forEach(item => {
+                const duplicatedItem = item.cloneNode(true);
+                duplicatedItem.setAttribute("aria-hidden", true);
+                scrollerInner.appendChild(duplicatedItem);
+            });
+        }
+    </script>
+</body>
+
+</html>

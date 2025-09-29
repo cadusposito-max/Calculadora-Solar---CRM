@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Calculadora Técnica</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+        <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+        <link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="bg-gray-900 text-gray-200 p-4 relative">
+
+        <div class="bg-gray-800 p-6 sm:p-8 rounded-xl shadow-2xl border border-gray-700 max-w-5xl w-full mx-auto my-12">
+                <div class="flex justify-between items-center mb-6">
+                        <a href="dashboard.html" class="flex items-center text-amber-400">
+                                <i class='bx bxs-calculator text-2xl mr-2'></i>
+                                <span class="text-1xl font-bold text-white">Calculadora Solar</span>
+                        </a>
+                        <a href="projeto-detalhes.html" class="text-gray-400 hover:text-amber-400 transition-colors">&larr;
+                                Voltar para
+                                o Cliente</a>
+                </div>
+
+                <h1 class="text-3xl font-bold text-white text-center mb-8">
+                        Validação Técnica de Sistema Fotovoltaico
+                </h1>
+
+                <form id="solar-form">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+                                <div class="flex flex-col space-y-4">
+                                        <h3 class="text-lg font-semibold text-white border-b-2 border-white pb-2 mb-2">
+                                                Dados do Sistema</h3>
+                                        <div><label for="inverterCount"
+                                                        class="block mb-2 text-sm font-medium text-gray-400">Quantidade
+                                                        de
+                                                        Inversores</label><input type="number" id="inverterCount"
+                                                        value="1" required
+                                                        class="bg-gray-700 border border-gray-600 text-gray-100 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5">
+                                        </div>
+                                        <div><label for="moduleCount"
+                                                        class="block mb-2 text-sm font-medium text-gray-400">Quantidade
+                                                        Total
+                                                        de Módulos</label><input type="number" id="moduleCount"
+                                                        placeholder="Ex: 21" required
+                                                        class="bg-gray-700 border border-gray-600 text-gray-100 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5">
+                                        </div>
+                                        <div><label for="irradiation"
+                                                        class="block mb-2 text-sm font-medium text-gray-400">Irradiação
+                                                        Solar
+                                                        (kWh/m²/dia)</label><input type="number" id="irradiation"
+                                                        value="5.4" step="0.1" required
+                                                        class="bg-gray-700 border border-gray-600 text-gray-100 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5">
+                                        </div>
+                                        <div><label for="systemLosses"
+                                                        class="block mb-2 text-sm font-medium text-gray-400">Perdas
+                                                        Totais do
+                                                        Sistema (%)</label><input type="number" id="systemLosses"
+                                                        value="15" required
+                                                        class="bg-gray-700 border border-gray-600 text-gray-100 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5">
+                                        </div>
+                                </div>
+                                <div class="flex flex-col space-y-4">
+                                        <h3 class="text-lg font-semibold text-white border-b-2 border-white pb-2 mb-2">
+                                                Inversor e Rede
+                                                Elétrica</h3>
+                                        <div><label for="gridType"
+                                                        class="block mb-2 text-sm font-medium text-gray-400">Tipo de
+                                                        Rede
+                                                        Elétrica (CA)</label><select id="gridType"
+                                                        class="bg-gray-700 border border-gray-600 text-gray-100 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5">
+                                                        <option value="220_bifasico">220V Bifásico (F+F+N)</option>
+                                                        <option value="380_trifasico">380V Trifásico (3F+N)</option>
+                                                        <option value="220_trifasico">220V Trifásico (3F+N)</option>
+                                                        <option value="127_monofasico">127V Monofásico (F+N)</option>
+                                                </select></div>
+                                        <div><label for="inverterPower"
+                                                        class="block mb-2 text-sm font-medium text-gray-400">Potência do
+                                                        Inversor (W)</label><input type="number" id="inverterPower"
+                                                        placeholder="Ex: 8000" required
+                                                        class="bg-gray-700 border border-gray-600 text-gray-100 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5">
+                                        </div>
+                                        <div><label for="overload"
+                                                        class="block mb-2 text-sm font-medium text-gray-400">Overload CC
+                                                        Máximo
+                                                        Permitido (%)</label><input type="number" id="overload"
+                                                        value="50" required
+                                                        class="bg-gray-700 border border-gray-600 text-gray-100 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5">
+                                        </div>
+                                        <div><label for="mpptCount"
+                                                        class="block mb-2 text-sm font-medium text-gray-400">Nº de
+                                                        MPPTs</label><input type="number" id="mpptCount" value="2"
+                                                        required
+                                                        class="bg-gray-700 border border-gray-600 text-gray-100 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5">
+                                        </div>
+                                        <div><label for="stringsPerMppt"
+                                                        class="block mb-2 text-sm font-medium text-gray-400">Strings por
+                                                        MPPT</label><input type="number" id="stringsPerMppt" value="1"
+                                                        required
+                                                        class="bg-gray-700 border border-gray-600 text-gray-100 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5">
+                                        </div>
+                                        <div><label for="mpptMinV"
+                                                        class="block mb-2 text-sm font-medium text-gray-400">Tensão Mín.
+                                                        MPPT
+                                                        (V)</label><input type="number" id="mpptMinV"
+                                                        placeholder="Ex: 140" required
+                                                        class="bg-gray-700 border border-gray-600 text-gray-100 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5">
+                                        </div>
+                                        <div><label for="inverterMaxV"
+                                                        class="block mb-2 text-sm font-medium text-gray-400">Tensão Máx.
+                                                        Entrada (V)</label><input type="number" id="inverterMaxV"
+                                                        placeholder="Ex: 1000" required
+                                                        class="bg-gray-700 border border-gray-600 text-gray-100 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5">
+                                        </div>
+                                        <div><label for="mpptMaxA"
+                                                        class="block mb-2 text-sm font-medium text-gray-400">Corrente
+                                                        Máx. por
+                                                        MPPT (A)</label><input type="number" id="mpptMaxA"
+                                                        placeholder="Ex: 15" step="0.1" required
+                                                        class="bg-gray-700 border border-gray-600 text-gray-100 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5">
+                                        </div>
+                                </div>
+                                <div class="flex flex-col space-y-4">
+                                        <h3 class="text-lg font-semibold text-white border-b-2 border-white pb-2 mb-2">
+                                                Módulo Fotovoltaico
+                                        </h3>
+                                        <div><label for="modulePower"
+                                                        class="block mb-2 text-sm font-medium text-gray-400">Potência
+                                                        (Wp)</label><input type="number" id="modulePower"
+                                                        placeholder="Ex: 550" required
+                                                        class="bg-gray-700 border border-gray-600 text-gray-100 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5">
+                                        </div>
+                                        <div><label for="moduleVmp"
+                                                        class="block mb-2 text-sm font-medium text-gray-400">Tensão
+                                                        (Vmp)</label><input type="number" id="moduleVmp"
+                                                        placeholder="Ex: 41.8" step="0.01" required
+                                                        class="bg-gray-700 border border-gray-600 text-gray-100 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5">
+                                        </div>
+                                        <div><label for="moduleImp"
+                                                        class="block mb-2 text-sm font-medium text-gray-400">Corrente
+                                                        (Imp)</label><input type="number" id="moduleImp"
+                                                        placeholder="Ex: 13.16" step="0.01" required
+                                                        class="bg-gray-700 border border-gray-600 text-gray-100 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5">
+                                        </div>
+                                        <div><label for="moduleVoc"
+                                                        class="block mb-2 text-sm font-medium text-gray-400">Tensão
+                                                        Circuito
+                                                        Aberto (Voc)</label><input type="number" id="moduleVoc"
+                                                        placeholder="Ex: 49.9" step="0.01" required
+                                                        class="bg-gray-700 border border-gray-600 text-gray-100 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5">
+                                        </div>
+                                        <div><label for="moduleIsc"
+                                                        class="block mb-2 text-sm font-medium text-gray-400">Corrente
+                                                        Curto-Circuito (Isc)</label><input type="number" id="moduleIsc"
+                                                        placeholder="Ex: 13.9" step="0.01" required
+                                                        class="bg-gray-700 border border-gray-600 text-gray-100 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5">
+                                        </div>
+                                        <div><label for="tempCoef"
+                                                        class="block mb-2 text-sm font-medium text-gray-400">Coef. Temp.
+                                                        Voc
+                                                        (%/°C)</label><input type="number" id="tempCoef" value="-0.27"
+                                                        step="0.01" required
+                                                        class="bg-gray-700 border border-gray-600 text-gray-100 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5">
+                                        </div>
+                                        <div><label for="minTemp"
+                                                        class="block mb-2 text-sm font-medium text-gray-400">Temp.
+                                                        Mínima
+                                                        (°C)</label><input type="number" id="minTemp" value="5" required
+                                                        class="bg-gray-700 border border-gray-600 text-gray-100 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5">
+                                        </div>
+                                </div>
+                        </div>
+                        <div class="bg-gray-900/50 p-4 rounded-lg mb-8">
+                                <div class="flex items-center">
+                                        <input id="enableVdropCalc" type="checkbox"
+                                                class="h-4 w-4 rounded border-gray-300 text-sky-600 focus:ring-sky-500">
+                                        <label for="enableVdropCalc"
+                                                class="ml-3 block text-sm font-medium text-gray-200">Calcular Queda de
+                                                Tensão nos Cabos CC (Opcional)</label>
+                                </div>
+                                <div id="vdrop-inputs" class="hidden grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+                                        <div><label for="cableDistance"
+                                                        class="block mb-2 text-sm font-medium text-gray-400">Distância
+                                                        do
+                                                        Arranjo ao Inversor (m)</label><input type="number"
+                                                        id="cableDistance" placeholder="Ex: 20"
+                                                        class="bg-gray-700 border border-gray-600 text-gray-100 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5">
+                                        </div>
+                                        <div><label for="dcCableSize"
+                                                        class="block mb-2 text-sm font-medium text-gray-400">Bitola do
+                                                        Cabo CC
+                                                        a Testar</label><select id="dcCableSize"
+                                                        class="bg-gray-700 border border-gray-600 text-gray-100 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5">
+                                                        <option value="4">4 mm²</option>
+                                                        <option value="6" selected>6 mm²</option>
+                                                        <option value="10">10 mm²</option>
+                                                        <option value="16">16 mm²</option>
+                                                        <option value="25">25 mm²</option>
+                                                </select></div>
+                                </div>
+                        </div>
+                        <div class="flex flex-col sm:flex-row gap-4">
+                                <button type="button" id="calculate-button" class="w-full cta-button green">
+                                        <i class='bx bx-check-shield text-xl mr-2'></i>Validar Configuração
+                                </button>
+                                <button type="button" id="save-button" class="w-full cta-button amber hidden">
+                                        <i class='bx bx-save text-xl mr-2'></i>Salvar Projeto
+                                </button>
+                                <button type="button" id="clear-button"
+                                        class="w-full sm:w-auto cta-button outline-amber">
+                                        <i class='bx bx-trash text-xl mr-2'></i>Limpar Campos
+                                </button>
+                        </div>
+
+                        <div id="results"
+                                class="hidden mt-8 p-6 bg-gray-700/50 border-l-4 border-amber-500 rounded-r-lg space-y-4">
+                        </div>
+        </div>
+
+        <script src="calculadora.js"></script>
+</body>
+
+</html>

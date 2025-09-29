@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calculadora Solar</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="bg-gray-900 text-gray-100 min-h-screen flex flex-col">
+
+  <header class="bg-gray-900/80 backdrop-blur-sm z-50 border-b border-gray-700">
+    <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+      <a href="index.html" class="flex items-center text-amber-400 hover:opacity-80 transition-opacity">
+        <i class='bx bxs-calculator text-3xl mr-2'></i>
+        <span class="text-2xl font-bold text-white">Calculadora Solar</span>
+      </a>
+      <div class="flex items-center space-x-4">
+        <a href="perfil.html" class="flex items-center gap-3 hover:bg-gray-700/50 p-2 rounded-lg transition-colors">
+          <div class="text-right hidden sm:block">
+            <span id="header-username" class="font-bold text-white text-sm">Carregando...</span>
+            <p id="user-email" class="text-xs text-gray-400"></p>
+          </div>
+          <img id="header-avatar" src="https://placehold.co/40x40/1F2937/4B5563?text=..."
+            class="w-10 h-10 rounded-full object-cover border-2 border-gray-600">
+        </a>
+        <button id="logout" class="cta-button outline-amber text-sm py-2 px-4 flex items-center">
+          <i class='bx bx-log-out text-lg mr-2'></i>
+          Sair
+        </button>
+      </div>
+    </nav>
+  </header>
+
+  <main class="flex-grow container mx-auto p-6">
+    <div class="w-full max-w-5xl mx-auto">
+
+      <div class="mb-6">
+        <div class="border-b border-gray-700">
+          <nav class="tabs-container flex space-x-2" aria-label="Tabs">
+            <button data-tab-target="#dashboard-content"
+              class="tab-button-chrome tab-active-chrome font-semibold text-sm">
+              Dashboard
+            </button>
+            <button data-tab-target="#projetos-content"
+              class="tab-button-chrome tab-inactive-chrome font-semibold text-sm">
+              Meus Projetos
+            </button>
+          </nav>
+        </div>
+      </div>
+
+      <div id="tabs-content">
+
+        <div id="dashboard-content" class="tab-pane">
+          <div class="mb-10">
+            <h2 class="text-2xl font-bold text-white mb-4">Dashboard Geral</h2>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+              <div class="bg-gray-800 p-5 rounded-lg border border-gray-700">
+                <h3 class="text-sm font-medium text-gray-400">Total de Projetos</h3>
+                <p id="total-projects" class="text-3xl font-bold text-amber-400 mt-2">0</p>
+              </div>
+              <div class="bg-gray-800 p-5 rounded-lg border border-gray-700">
+                <h3 class="text-sm font-medium text-gray-400">Potência Total Instalada</h3>
+                <p id="total-power" class="text-3xl font-bold text-amber-400 mt-2">0 kWp</p>
+              </div>
+              <div class="bg-gray-800 p-5 rounded-lg border border-gray-700">
+                <h3 class="text-sm font-medium text-gray-400">Média por Projeto</h3>
+                <p id="average-power" class="text-3xl font-bold text-amber-400 mt-2">0 kWp</p>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div class="bg-gray-800 p-5 rounded-lg border border-gray-700">
+                <h3 class="text-lg font-semibold text-white mb-4">Distribuição por Potência</h3>
+                <div class="max-w-xs mx-auto">
+                  <canvas id="doughnut-chart"></canvas>
+                </div>
+              </div>
+              <div class="bg-gray-800 p-5 rounded-lg border border-gray-700 flex flex-col">
+                <h3 class="text-lg font-semibold text-white mb-4">Projetos por Dia (Mês Atual)</h3>
+                <div class="flex-grow relative h-64"> <canvas id="line-chart"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="projetos-content" class="tab-pane hidden">
+          <div class="flex flex-wrap justify-between items-center gap-4 mb-6">
+            <div>
+              <h1 class="text-3xl font-bold text-white">Meus Projetos</h1>
+              <p class="text-gray-400 mt-2">Crie, gerencie e volte a editar os seus projetos salvos a qualquer momento.
+              </p>
+            </div>
+            <button id="new-project-button" class="cta-button green flex items-center">
+              <i class='bx bx-plus-circle mr-2'></i>
+              Criar Novo Projeto
+            </button>
+          </div>
+
+          <div class="flex flex-col sm:flex-row gap-4 mb-6 p-4 bg-gray-800/50 rounded-lg border border-gray-700">
+            <div class="relative flex-grow">
+              <i class='bx bx-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400'></i>
+              <input type="text" id="filter-input" placeholder="Filtrar por nome do projeto ou cliente..."
+                class="w-full p-2 pl-10 rounded bg-gray-700 border border-gray-600 focus:border-amber-500 focus:ring-amber-500 transition-colors">
+            </div>
+
+            <div class="flex items-center gap-2 flex-shrink-0">
+              <label for="filter-date" class="text-gray-400 text-sm">Data:</label>
+              <input type="date" id="filter-date"
+                class="p-2 rounded bg-gray-700 border border-gray-600 focus:border-amber-500 focus:ring-amber-500 transition-colors text-gray-400">
+            </div>
+
+            <div class="flex items-center gap-2 flex-shrink-0">
+              <label for="sort-select" class="text-gray-400 text-sm">Ordenar por:</label>
+              <select id="sort-select"
+                class="p-2 rounded bg-gray-700 border border-gray-600 focus:border-amber-500 focus:ring-amber-500 transition-colors">
+                <option value="created_at_desc">Mais Recentes (Criação)</option>
+                <option value="created_at_asc">Mais Antigos (Criação)</option>
+                <option value="updated_at_desc">Última Modificação</option>
+                <option value="nome_projeto_asc">Nome do Projeto (A-Z)</option>
+              </select>
+            </div>
+          </div>
+          <div id="project-list" class="bg-gray-800 rounded-lg border border-gray-700 min-h-[200px]">
+          </div>
+          <div id="pagination-controls" class="flex justify-between items-center mt-6">
+            <button id="prev-page-button"
+              class="cta-button outline-amber disabled:opacity-50 disabled:cursor-not-allowed">
+              <i class='bx bx-chevron-left mr-2'></i> Anterior
+            </button>
+            <span id="page-info" class="text-gray-400 font-semibold">Página 1 de 1</span>
+            <button id="next-page-button"
+              class="cta-button outline-amber disabled:opacity-50 disabled:cursor-not-allowed">
+              Próximo <i class='bx bx-chevron-right ml-2'></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <dialog id="project-modal"
+    class="bg-gray-800 text-white p-8 rounded-xl border border-gray-700 shadow-2xl backdrop:bg-black/70 backdrop:backdrop-blur-sm w-full max-w-lg">
+  </dialog>
+
+  <script src="dashboard-script.js" defer></script>
+</body>
+
+</html>
