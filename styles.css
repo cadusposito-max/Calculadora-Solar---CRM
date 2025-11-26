@@ -262,3 +262,186 @@ body {
     background-position: 70px 70px;
   }
 }
+/* Animação para o Modal de Novidades */
+dialog[open] {
+    animation: zoomIn 0.3s ease-out forwards;
+}
+
+dialog::backdrop {
+    background-color: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(4px);
+}
+
+@keyframes zoomIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Barra de rolagem personalizada para o widget */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: #1f2937;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #4b5563;
+    border-radius: 3px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #6b7280;
+}
+/* --- Estilos Compactos da Calculadora (Novo Layout) --- */
+
+.label-compact {
+    display: block;
+    margin-bottom: 0.25rem;
+    font-size: 0.75rem; /* text-xs */
+    font-weight: 600;
+    color: #9ca3af; /* text-gray-400 */
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.input-compact {
+    background-color: #374151; /* bg-gray-700 */
+    border: 1px solid #4b5563; /* border-gray-600 */
+    color: #f3f4f6; /* text-gray-100 */
+    font-size: 0.875rem; /* text-sm */
+    border-radius: 0.5rem;
+    width: 100%;
+    padding: 0.4rem 0.6rem; /* Padding reduzido para ficar compacto */
+    transition: all 0.2s ease-in-out;
+}
+
+.input-compact:focus {
+    outline: none;
+    border-color: #3b82f6; /* blue-500 */
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3); /* Ring effect */
+}
+
+/* Ajuste visual para selects compactos ficarem alinhados */
+select.input-compact {
+    padding-right: 2rem;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%239ca3af' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 0.5rem center;
+    background-repeat: no-repeat;
+    background-size: 1.5em 1.5em;
+}
+/* --- Estilos do Combobox (Pesquisa Inteligente) --- */
+.combobox-container {
+    position: relative;
+    width: 100%;
+}
+
+.combobox-list {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    background-color: #1f2937; /* bg-gray-800 */
+    border: 1px solid #4b5563; /* border-gray-600 */
+    border-radius: 0.5rem;
+    margin-top: 0.25rem;
+    max-height: 200px;
+    overflow-y: auto;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+    display: none; /* Escondido por padrão */
+}
+
+.combobox-list.show {
+    display: block;
+}
+
+.combobox-item {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem; /* text-sm */
+    color: #d1d5db; /* text-gray-300 */
+    cursor: pointer;
+    border-bottom: 1px solid #374151; /* gray-700 */
+    transition: background-color 0.15s;
+}
+
+.combobox-item:last-child {
+    border-bottom: none;
+}
+
+.combobox-item:hover {
+    background-color: #374151; /* gray-700 */
+    color: #fff;
+}
+
+.combobox-item strong {
+    color: #f59e0b; /* amber-500 destaque */
+    font-weight: 600;
+}
+/* --- Animações do Toast (Notificação) --- */
+
+/* Entrada com efeito elástico (Bounce) */
+@keyframes slideInBounce {
+    0% { transform: translateX(120%); opacity: 0; }
+    60% { transform: translateX(-10%); opacity: 1; } /* Passa um pouco do ponto */
+    80% { transform: translateX(5%); } /* Volta um pouquinho */
+    100% { transform: translateX(0); } /* Para no lugar certo */
+}
+
+/* Saída suave deslizando para a direita */
+@keyframes slideOutRight {
+    from { transform: translateX(0); opacity: 1; }
+    to { transform: translateX(120%); opacity: 0; }
+}
+
+.toast-enter {
+    animation: slideInBounce 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+.toast-exit {
+    animation: slideOutRight 0.4s ease-in forwards;
+}
+/* --- Estilos do Novo Dashboard --- */
+
+/* Texto com Gradiente (Dourado) */
+.text-gradient-amber {
+    background: linear-gradient(to right, #fbbf24, #d97706);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Cards com efeito de vidro e brilho */
+.glass-card {
+    background: linear-gradient(145deg, rgba(31, 41, 55, 0.6), rgba(17, 24, 39, 0.8));
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(75, 85, 99, 0.4);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+}
+
+.glass-card:hover {
+    border-color: rgba(245, 158, 11, 0.3); /* Amber glow */
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+}
+
+/* Ícone flutuante no fundo do card */
+.card-icon-bg {
+    position: absolute;
+    right: -10px;
+    bottom: -10px;
+    font-size: 5rem;
+    opacity: 0.05;
+    transform: rotate(-10deg);
+    transition: all 0.3s;
+}
+
+.glass-card:hover .card-icon-bg {
+    transform: rotate(0deg) scale(1.1);
+    opacity: 0.1;
+}

@@ -1,36 +1,246 @@
-// Arquivo: calculadora.js (VERSÃO CORRIGIDA E MELHORADA)
+// Arquivo: calculadora.js (LAYOUT PROFISSIONAL + SUPABASE FUNCIONANDO)
 
-// --- CONFIGURAÇÃO E CONSTANTES ---
-const SUPABASE_URL = "https://uhofnzijvikcgicdkphz.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVob2ZuemlqdmlrY2dpY2RrcGh6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg4MzA2OTAsImV4cCI6MjA3NDQwNjY5MH0.s0x31vAorKqMMtp149a2GndlNPNTuV52TRsCt4X7yVg";
+const SUPABASE_URL = "https://uhofnzijvikcgicdkphz.supabase.co"; // Substitua se necessário
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVob2ZuemlqdmlrY2dpY2RrcGh6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg4MzA2OTAsImV4cCI6MjA3NDQwNjY5MH0.s0x31vAorKqMMtp149a2GndlNPNTuV52TRsCt4X7yVg"; // Substitua se necessário
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-const ALL_INPUT_IDS = ['gridType', 'inverterCount', 'moduleCount', 'irradiation', 'systemLosses', 'inverterPower', 'overload', 'mpptCount', 'stringsPerMppt', 'mpptMinV', 'inverterMaxV', 'mpptMaxA', 'modulePower', 'moduleVmp', 'moduleImp', 'moduleVoc', 'moduleIsc', 'tempCoef', 'minTemp', 'enableVdropCalc', 'cableDistance', 'dcCableSize'];
+
+// LISTA DE TODOS OS INPUTS
+const ALL_INPUT_IDS = [
+    'invBrand', 'invModel', 'modBrand', 'modModel',
+    'gridType', 'inverterCount', 'moduleCount', 'irradiation', 'systemLosses',
+    'inverterPower', 'overload', 'mpptCount', 'connectorsPerMppt', 'mpptMinV',
+    'inverterMaxV', 'mpptMaxA', 'modulePower', 'moduleVmp', 'moduleImp',
+    'moduleVoc', 'moduleIsc', 'tempCoef', 'minTemp', 'enableVdropCalc',
+    'cableDistance', 'dcCableSize', 'groupingFactor'
+];
 
 let generationChartInstance;
 let lastCalculatedResults = {};
 let currentProjectId = null;
 let currentProjectName = "Novo Projeto";
+let allModulesList = [];
+let allInvertersList = [];
 
-// --- LÓGICA DE DADOS (Supabase) ---
+async function loadEquipmentDatabase() {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    // Carrega Módulos
+    const { data: mods } = await supabase.from('db_modulos').select('*').order('created_at', { ascending: false });
+    if (mods) {
+        allModulesList = mods;
+        setupCombobox('Module', mods);
+    }
+
+    // Carrega Inversores
+    const { data: invs } = await supabase.from('db_inversores').select('*').order('created_at', { ascending: false });
+    if (invs) {
+        allInvertersList = invs;
+        setupCombobox('Inverter', invs);
+    }
+}
+
+// Configura o comportamento do Combobox (Inputs e Listas)
+function setupCombobox(type, dataList) {
+    const input = document.getElementById(`search${type}`);
+    const list = document.getElementById(`list${type}`);
+    const hiddenId = document.getElementById(`saved${type}sId`); // savedInvertersId ou savedModulesId
+
+    // Função para renderizar a lista
+    const renderList = (filterText = '') => {
+        list.innerHTML = '';
+
+        // Se filtro vazio: Pega os 5 primeiros (mais recentes, pois já vem ordenado do banco)
+        // Se tem texto: Filtra tudo que contém o texto
+        let filtered = [];
+        if (!filterText) {
+            filtered = dataList.slice(0, 5); // OS 5 ÚLTIMOS ADICIONADOS
+        } else {
+            const lower = filterText.toLowerCase();
+            filtered = dataList.filter(item =>
+                (item.marca + ' ' + item.modelo).toLowerCase().includes(lower)
+            );
+        }
+
+        if (filtered.length === 0) {
+            list.innerHTML = `<div class="p-2 text-xs text-gray-500 text-center">Nenhum encontrado</div>`;
+            return;
+        }
+
+        filtered.forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'combobox-item';
+            // Destaque visual
+            div.innerHTML = `<strong>${item.marca}</strong> - ${item.modelo} <span class="text-xs opacity-50 block">${item.potencia}W</span>`;
+
+            div.onclick = () => {
+                // Ao clicar: Preenche input, salva ID oculto, fecha lista e carrega dados
+                input.value = `${item.marca} - ${item.modelo}`;
+                hiddenId.value = item.id;
+                list.classList.remove('show');
+                if (type === 'Module') applyModulePreset(item.id);
+                else applyInverterPreset(item.id);
+            };
+            list.appendChild(div);
+        });
+    };
+
+    // Eventos
+    input.addEventListener('focus', () => {
+        renderList(input.value); // Mostra lista ao clicar
+        list.classList.add('show');
+    });
+
+    input.addEventListener('input', (e) => {
+        renderList(e.target.value); // Filtra ao digitar
+        list.classList.add('show');
+        // Se limpar o texto, limpa o ID selecionado
+        if(e.target.value === '') hiddenId.value = '';
+    });
+
+    // Clicar fora fecha a lista
+    document.addEventListener('click', (e) => {
+        if (!input.contains(e.target) && !list.contains(e.target)) {
+            list.classList.remove('show');
+        }
+    });
+}
+
+// Funções de Aplicar Preset (Adaptadas para receber ID direto ou buscar nas listas globais)
+function applyModulePreset(id) {
+    // Se não veio ID por parâmetro, tenta pegar do input oculto (caso de uso legado ou erro)
+    if (!id) id = document.getElementById('savedModulesId').value;
+    if (!id) return;
+
+    const m = allModulesList.find(item => item.id == id);
+    if (m) {
+        document.getElementById('modBrand').value = m.marca || '';
+        document.getElementById('modModel').value = m.modelo || '';
+        document.getElementById('modulePower').value = m.potencia;
+        document.getElementById('moduleVmp').value = m.vmp;
+        document.getElementById('moduleImp').value = m.imp;
+        document.getElementById('moduleVoc').value = m.voc;
+        document.getElementById('moduleIsc').value = m.isc;
+        document.getElementById('tempCoef').value = m.coef_temp;
+        document.getElementById('minTemp').value = m.temp_min;
+        showToast(`Módulo carregado: ${m.marca}`, 'success');
+    }
+}
+
+function applyInverterPreset(id) {
+    if (!id) id = document.getElementById('savedInvertersId').value;
+    if (!id) return;
+
+    const i = allInvertersList.find(item => item.id == id);
+    if (i) {
+        document.getElementById('invBrand').value = i.marca || '';
+        document.getElementById('invModel').value = i.modelo || '';
+        document.getElementById('gridType').value = i.tipo_rede;
+        document.getElementById('inverterPower').value = i.potencia;
+        document.getElementById('overload').value = i.overload;
+        document.getElementById('mpptCount').value = i.num_mppts;
+        document.getElementById('connectorsPerMppt').value = i.conector_config;
+        document.getElementById('mpptMinV').value = i.v_min;
+        document.getElementById('inverterMaxV').value = i.v_max;
+        document.getElementById('mpptMaxA').value = i.i_max;
+        showToast(`Inversor carregado: ${i.marca}`, 'success');
+    }
+}
+
+// Atualização Importante: O delete precisa ler do input hidden agora
+async function deleteEquipment(type) {
+    if(!confirm("Apagar este item salvo do banco de dados?")) return;
+
+    // Pega o ID do input oculto
+    const id = document.getElementById(type === 'module' ? 'savedModulesId' : 'savedInvertersId').value;
+
+    if(!id) {
+        showToast("Selecione um item na busca para apagar.", "error");
+        return;
+    }
+
+    const table = type === 'module' ? 'db_modulos' : 'db_inversores';
+    const { error } = await supabase.from(table).delete().eq('id', id);
+
+    if(error) showToast("Erro ao apagar.", "error");
+    else {
+        showToast("Item apagado.", "success");
+        // Limpa os campos de busca
+        document.getElementById(type === 'module' ? 'searchModule' : 'searchInverter').value = '';
+        document.getElementById(type === 'module' ? 'savedModulesId' : 'savedInvertersId').value = '';
+        // Recarrega a lista
+        loadEquipmentDatabase();
+    }
+}
+async function saveEquipment(type) {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) { showToast('Faça login para salvar.', 'error'); return; }
+
+    const table = type === 'module' ? 'db_modulos' : 'db_inversores';
+
+    // Pega os valores dos inputs de texto (não do campo de busca)
+    const marca = document.getElementById(type === 'module' ? 'modBrand' : 'invBrand').value;
+    const modelo = document.getElementById(type === 'module' ? 'modModel' : 'invModel').value;
+
+    if (!marca || !modelo) { showToast('Preencha Marca e Modelo nos campos abaixo para salvar.', 'error'); return; }
+
+    let payload = { user_id: user.id, marca, modelo };
+
+    // Monta o objeto baseado no tipo
+    if (type === 'module') {
+        payload.potencia = parseFloat(document.getElementById('modulePower').value) || 0;
+        payload.vmp = parseFloat(document.getElementById('moduleVmp').value) || 0;
+        payload.imp = parseFloat(document.getElementById('moduleImp').value) || 0;
+        payload.voc = parseFloat(document.getElementById('moduleVoc').value) || 0;
+        payload.isc = parseFloat(document.getElementById('moduleIsc').value) || 0;
+        payload.coef_temp = parseFloat(document.getElementById('tempCoef').value) || 0;
+        payload.temp_min = parseFloat(document.getElementById('minTemp').value) || 0;
+    } else {
+        payload.potencia = parseFloat(document.getElementById('inverterPower').value) || 0;
+        payload.tipo_rede = document.getElementById('gridType').value;
+        payload.overload = parseFloat(document.getElementById('overload').value) || 0;
+        payload.num_mppts = parseFloat(document.getElementById('mpptCount').value) || 0;
+        payload.conector_config = document.getElementById('connectorsPerMppt').value;
+        payload.v_min = parseFloat(document.getElementById('mpptMinV').value) || 0;
+        payload.v_max = parseFloat(document.getElementById('inverterMaxV').value) || 0;
+        payload.i_max = parseFloat(document.getElementById('mpptMaxA').value) || 0;
+    }
+
+    const { error } = await supabase.from(table).insert(payload);
+
+    if (error) {
+        showToast('Erro ao salvar: ' + error.message, 'error');
+    } else {
+        showToast(`${type === 'module' ? 'Módulo' : 'Inversor'} salvo com sucesso!`, 'success');
+        // Recarrega a lista para aparecer na pesquisa imediatamente
+        loadEquipmentDatabase();
+    }
+}
+
+// --- 2. LÓGICA DO PROJETO (CARREGAR E SALVAR) ---
 
 async function loadProjectData() {
     const params = new URLSearchParams(window.location.search);
     const projectId = params.get('id');
-    if (!projectId) {
-        alert("Nenhum projeto selecionado. Redirecionando para o dashboard.");
-        window.location.href = 'dashboard.html';
-        return;
+    if (!projectId) return;
+
+    const backLink = document.getElementById('back-link');
+    if (backLink) {
+        // Atualiza o link para incluir o ID do projeto atual
+        backLink.href = `projeto-detalhes.html?id=${projectId}`;
+        // Muda o texto para deixar claro para onde volta
+        backLink.innerHTML = "<i class='bx bx-arrow-back mr-1'></i> Voltar ao Projeto";
     }
+
     currentProjectId = projectId;
     const { data: projectData, error } = await supabase.from('calculos_salvos').select('*').eq('id', projectId).single();
-    if (error) {
-        alert("Não foi possível carregar os dados do projeto.");
-        console.error('Erro detalhado do Supabase:', error);
-        window.location.href = 'dashboard.html';
-        return;
-    }
+
+    if (error) { console.error('Erro ao carregar:', error); return; }
+
     currentProjectName = projectData.nome_projeto;
-    document.querySelector('h1').innerText = `Validação Técnica: ${currentProjectName}`;
+    const titleEl = document.querySelector('h1');
+    if(titleEl) titleEl.innerText = `Validação: ${currentProjectName}`;
+
     if (projectData.dados_completos) {
         const formData = projectData.dados_completos;
         for (const key in formData) {
@@ -40,416 +250,505 @@ async function loadProjectData() {
                 else el.value = formData[key];
             }
         }
-        document.getElementById('enableVdropCalc').dispatchEvent(new Event('change'));
+        const vdropCheck = document.getElementById('enableVdropCalc');
+        if(vdropCheck && vdropCheck.checked) document.getElementById('vdrop-inputs').classList.remove('hidden');
     }
 }
 
 async function updateProject() {
-    if (!currentProjectId) { alert("Erro: ID do projeto não encontrado."); return; }
-    if (Object.keys(lastCalculatedResults).length === 0) { alert("Por favor, valide a configuração antes de salvar."); return; }
+    if (!currentProjectId) { showToast("Erro: ID não encontrado.", "error"); return; }
+    if (Object.keys(lastCalculatedResults).length === 0) {
+        showToast("Valide a configuração antes de salvar.", "error"); return;
+    }
+    const saveBtn = document.getElementById('save-button');
+    saveBtn.innerText = 'Salvando...';
+    saveBtn.disabled = true;
+
+    const currentInputs = {};
+    for (const id of ALL_INPUT_IDS) {
+        const el = document.getElementById(id);
+        if(el) {
+            if(el.type === 'checkbox') currentInputs[id] = el.checked;
+            else if(['gridType','connectorsPerMppt','invBrand','invModel','modBrand','modModel'].includes(id)) currentInputs[id] = el.value;
+            else currentInputs[id] = parseFloat(el.value) || 0;
+        }
+    }
+
     const projectUpdateData = {
         potencia_pico_kwp: lastCalculatedResults.potenciaPico,
-        potencia_inversor_w: lastCalculatedResults.inputs.inverterPower,
-        total_modulos: lastCalculatedResults.inputs.moduleCount,
+        potencia_inversor_w: currentInputs.inverterPower,
+        total_modulos: currentInputs.moduleCount,
         geracao_media_kwh: lastCalculatedResults.geracaoMedia,
-        dados_completos: lastCalculatedResults.inputs
+        dados_completos: currentInputs
     };
+
     const { error } = await supabase.from('calculos_salvos').update(projectUpdateData).eq('id', currentProjectId);
-    if (error) {
-        alert("Erro ao atualizar o projeto: " + error.message);
-    } else {
-        alert("Projeto atualizado com sucesso!");
-        window.location.href = 'dashboard.html';
-    }
+    saveBtn.innerText = 'Salvar Projeto';
+    saveBtn.disabled = false;
+    if (error) { showToast("Erro ao salvar: " + error.message, "error"); }
+    else { showToast("Projeto salvo com sucesso!", "success"); }
 }
 
-// --- LÓGICA PRINCIPAL DA CALCULADORA ---
+// --- 3. CÁLCULO (Motor Principal) ---
 
 function calculate() {
-    console.log("Checkpoint 1: Função de cálculo iniciada.");
     const resultsDiv = document.getElementById('results');
-    const hideResults = () => { resultsDiv.innerHTML = ''; resultsDiv.classList.add('hidden'); if (generationChartInstance) { generationChartInstance.destroy(); } };
+    const hideResults = () => { resultsDiv.innerHTML = ''; resultsDiv.classList.add('hidden'); if (generationChartInstance) generationChartInstance.destroy(); };
+
     const inputs = {};
     try {
         for (const id of ALL_INPUT_IDS) {
             const el = document.getElementById(id);
             if (el) {
-                // --- ADICIONADO ESTE 'IF' PARA O CHECKBOX ---
-                if (el.type === 'checkbox') {
-                    inputs[id] = el.checked;
-
-                } else if (el.type === 'number') {
-                    if (el.value === '') {
-                        if (id === 'cableDistance' && !document.getElementById('enableVdropCalc').checked) {
-                            inputs[id] = 0;
-                            continue;
-                        }
-                        hideResults();
-                        alert(`Erro: O campo "${document.querySelector(`label[for=${id}]`).innerText}" deve ser preenchido.`);
-                        return;
-                    }
-                    inputs[id] = parseFloat(el.value);
-                } else {
-                    if (el.value === '') {
-                        hideResults();
-                        alert(`Erro: O campo "${document.querySelector(`label[for=${id}]`).innerText}" deve ser preenchido.`);
-                        return;
-                    }
-                    inputs[id] = el.value;
-                }
+                if (el.type === 'checkbox') inputs[id] = el.checked;
+                else if (['gridType','connectorsPerMppt','invBrand','invModel','modBrand','modModel'].includes(id)) inputs[id] = el.value;
+                else inputs[id] = parseFloat(el.value);
             }
         }
-    } catch (e) { console.error("Erro ao ler ou validar os inputs:", e); alert("Ocorreu um erro ao ler os dados do formulário."); return; }
+        const connectorsStr = inputs.connectorsPerMppt.toString();
+        let physicalLimits = connectorsStr.includes(',')
+            ? connectorsStr.split(',').map(s => parseInt(s.trim()))
+            : Array(inputs.mpptCount).fill(parseInt(connectorsStr));
+        if (physicalLimits.length === 1 && inputs.mpptCount > 1) physicalLimits = Array(inputs.mpptCount).fill(physicalLimits[0]);
+        inputs.physicalLimits = physicalLimits;
+    } catch (e) { console.error(e); return; }
 
-    console.log("Checkpoint 2: Inputs lidos e validados com sucesso.");
-    if (inputs.moduleCount % inputs.inverterCount !== 0) { hideResults(); alert("Erro: O número total de módulos não pode ser dividido igualmente entre todos os inversores."); return; }
+    if (inputs.moduleCount % inputs.inverterCount !== 0) { hideResults(); alert("Erro: Módulos não dividem igualmente."); return; }
+
     const modulesPerInverter = inputs.moduleCount / inputs.inverterCount;
-    const totalCurrentPerMppt = inputs.stringsPerMppt * inputs.moduleIsc;
-    if (totalCurrentPerMppt > inputs.mpptMaxA) { hideResults(); alert(`Erro de Corrente: As ${inputs.stringsPerMppt} strings em paralelo geram ${totalCurrentPerMppt.toFixed(2)}A (Isc), o que excede o limite de ${inputs.mpptMaxA}A da MPPT.`); return; }
-    const minModulesString = Math.ceil(inputs.mpptMinV / inputs.moduleVmp);
-    const vocCorrected = inputs.moduleVoc * (1 + (inputs.minTemp - 25) * (inputs.tempCoef / 100));
-    const maxModulesString = Math.floor(inputs.inverterMaxV / vocCorrected);
-    const totalStringsPerInverter = inputs.mpptCount * inputs.stringsPerMppt;
-    const baseModulesPerString = Math.floor(modulesPerInverter / totalStringsPerInverter);
-    const remainderModules = modulesPerInverter % totalStringsPerInverter;
-    const longestStringLength = baseModulesPerString + (remainderModules > 0 ? 1 : 0);
-    const shortestStringLength = baseModulesPerString;
-    const isValidArrangement = (shortestStringLength > 0 && shortestStringLength >= minModulesString && longestStringLength <= maxModulesString);
-    console.log("Checkpoint 3: Validação do arranjo (strings) concluída.");
+    const vocCold = inputs.moduleVoc * (1 + (inputs.minTemp - 25) * (inputs.tempCoef / 100));
+    const maxSeries = Math.floor(inputs.inverterMaxV / vocCold);
+    const minSeries = Math.ceil(inputs.mpptMinV / inputs.moduleVmp);
+    const maxStringsElectrical = Math.floor(inputs.mpptMaxA / inputs.moduleIsc);
 
-    if (!isValidArrangement) {
-        let errorMsg = `a divisão resultaria em strings com ${shortestStringLength} ou ${longestStringLength} módulos. Este arranjo é inválido pois o range permitido é de ${minModulesString} a ${maxModulesString}.`;
-        resultsDiv.innerHTML = `<div class="p-4"><h2 class="text-2xl font-bold text-white mb-4">Resultado da Validação</h2><div class="bg-red-900/70 text-red-300 p-4 rounded-lg"><strong class="font-bold">Arranjo Inválido:</strong> ${errorMsg}</div></div>`;
-        resultsDiv.classList.remove('hidden'); document.getElementById('save-button').classList.add('hidden'); return;
+    if (maxStringsElectrical < 1) { hideResults(); alert(`Erro Crítico: Corrente do módulo (${inputs.moduleIsc}A) maior que MPPT (${inputs.mpptMaxA}A).`); return; }
+
+    const realLimitsPerMppt = inputs.physicalLimits.map(phys => Math.min(phys, maxStringsElectrical));
+    const maxTotalStringsInverter = realLimitsPerMppt.reduce((a,b) => a+b, 0);
+
+    const autoConfig = findOptimalConfiguration(modulesPerInverter, inputs.mpptCount, realLimitsPerMppt, maxTotalStringsInverter, minSeries, maxSeries);
+
+    if (!autoConfig.success) {
+        hideResults(); alert(`Arranjo impossível: ${autoConfig.message}`); return;
     }
-    const powerRatioPercent = ((modulesPerInverter * inputs.modulePower) / inputs.inverterPower) * 100;
+
+    const distribution = autoConfig.distribution;
+    let electricalError = null, maxV = 0;
+
+    distribution.forEach((mppt, index) => {
+        if (mppt.numStrings === 0) return;
+        const vMax = mppt.modulesPerString * vocCold;
+        if (vMax > maxV) maxV = vMax;
+        if (vMax > inputs.inverterMaxV) electricalError = `Sobretensão na MPPT ${index+1}`;
+    });
+
+    if (electricalError) {
+        resultsDiv.innerHTML = `<div class="p-4 bg-red-900/70 text-red-300 rounded-lg font-bold">${electricalError}</div>`;
+        resultsDiv.classList.remove('hidden'); return;
+    }
+
     const systemDcPowerKw = (inputs.moduleCount * inputs.modulePower) / 1000;
-    const performanceRatio = 1 - (inputs.systemLosses / 100);
+    const powerRatioPercent = ((modulesPerInverter * inputs.modulePower) / inputs.inverterPower) * 100;
     const daysInMonth = [31, 28.25, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
     const seasonalFactors = [1.15, 1.1, 1.05, 0.95, 0.85, 0.8, 0.8, 0.85, 0.95, 1.05, 1.1, 1.15];
+    const performanceRatio = 1 - (inputs.systemLosses / 100);
     const monthlyGeneration = seasonalFactors.map((factor, index) => (systemDcPowerKw * inputs.irradiation * factor * performanceRatio) * daysInMonth[index]);
     const totalAnnualGeneration = monthlyGeneration.reduce((a, b) => a + b, 0);
-    lastCalculatedResults = { inputs, potenciaPico: systemDcPowerKw, geracaoMedia: totalAnnualGeneration / 12, monthlyGeneration, totalAnnualGeneration, modulesPerInverter, powerRatioPercent, minModulesString, maxModulesString, vocCorrected };
 
-    console.log("Checkpoint 4: Resultados calculados. Prestes a gerar o HTML do relatório.");
+    lastCalculatedResults = {
+        inputs, potenciaPico: systemDcPowerKw, geracaoMedia: totalAnnualGeneration / 12, monthlyGeneration,
+        totalAnnualGeneration, modulesPerInverter, powerRatioPercent, distribution,
+        vocCorrected: vocCold, maxVStringGlobal: maxV
+    };
+
+    // Gera o HTML e exibe
     resultsDiv.innerHTML = generateReportHTML(lastCalculatedResults);
     resultsDiv.classList.remove('hidden');
     document.getElementById('save-button').classList.remove('hidden');
-    console.log("Checkpoint 5: HTML gerado e inserido. Prestes a criar o gráfico.");
     createGenerationChart(monthlyGeneration, totalAnnualGeneration);
-    console.log("Checkpoint 6: Gráfico criado. Função concluída com sucesso!");
 }
 
-// --- FUNÇÕES DE GERAÇÃO DE HTML E DIAGRAMAS ---
+// Algoritmo de Distribuição (Compacto)
+function findOptimalConfiguration(t,m,l,mx,mn,mxs){for(let s=mxs;s>=mn;s--){let b=Math.floor(t/s),r=t%s;if(r===0){if(b<=mx&&b>0){let d=distributeStringsToMppts(b,s,m,l);if(d.success)return{success:true,distribution:d.result}}}else if((s+1)<=mxs){if(b<=mx&&r<=b){let d=distributeMixedStrings(r,s+1,b-r,s,m,l);if(d.success)return{success:true,distribution:d.result}}}}return{success:false,message:"Não foi possível achar arranjo válido."}}
+function distributeStringsToMppts(t,s,m,l){let d=[],rem=t;for(let i=0;i<m;i++){let act=Math.min(Math.ceil(rem/(m-i)),l[i]);d.push({numStrings:act,modulesPerString:act>0?s:0});rem-=act}return{success:rem===0,result:d}}
+function distributeMixedStrings(ql,sl,qc,sc,m,l){let d=Array(m).fill(null).map(()=>({numStrings:0,modulesPerString:0})),curr=0;const add=(sz)=>{let att=0;while(att<m){let mp=d[curr];if(mp.numStrings<l[curr]){if(mp.numStrings===0||mp.modulesPerString===sz){mp.numStrings++;mp.modulesPerString=sz;curr=(curr+1)%m;return true}}curr=(curr+1)%m;att++}return false};for(let i=0;i<ql;i++)if(!add(sl))return{success:false};for(let i=0;i<qc;i++)if(!add(sc))return{success:false};return{success:true,result:d}}
 
-function generateACSizingHTML(inverterPower, gridType) {
-    const standardBreakers = [10, 16, 20, 25, 32, 40, 50, 63, 70, 80, 100, 125, 150, 175, 200];
-    const cableAmpacityFromNBR = { "0.50": 6, "0.75": 10, "1.00": 12, "1.50": 15.5, "2.50": 21, "4.00": 28, "6.00": 36, "10.00": 50, "16.00": 68, "25.00": 89, "35.00": 111, "50.00": 134, "70.00": 171, "95.00": 207, "120.00": 239 };
-    const cableSizes = Object.keys(cableAmpacityFromNBR);
-    let acCurrent = 0, breakerType = '', voltage = 0;
-    const sqrt3 = 1.732;
+// --- 4. VISUAL E RELATÓRIO (AQUI ESTÁ A CORREÇÃO VISUAL) ---
 
-    switch (gridType) {
-        case '220_bifasico': voltage = 220; acCurrent = inverterPower / voltage; breakerType = 'Bipolar'; break;
-        case '380_trifasico': voltage = 380; acCurrent = inverterPower / (voltage * sqrt3); breakerType = 'Tripolar'; break;
-        case '220_trifasico': voltage = 220; acCurrent = inverterPower / (voltage * sqrt3); breakerType = 'Tripolar'; break;
-        case '127_monofasico': voltage = 127; acCurrent = inverterPower / voltage; breakerType = 'Bipolar'; break;
+function generateReportHTML(data) {
+    const { inputs, monthlyGeneration, totalAnnualGeneration, powerRatioPercent, distribution, maxVStringGlobal } = data;
+
+    // -- Cálculos CA --
+    const voltage = inputs.gridType.includes('380') ? 380 : (inputs.gridType.includes('220') ? 220 : 127);
+    const isThreePhase = inputs.gridType.includes('trifasico');
+    const nominalCurrent = inputs.inverterPower / (isThreePhase ? voltage * 1.732 : voltage);
+    const projectCurrent = nominalCurrent * 1.25;
+
+    const breakers = [10, 16, 20, 25, 32, 40, 50, 63, 70, 80, 100, 125, 150, 175, 200, 225, 250];
+    const breaker = breakers.find(b => b >= projectCurrent) || 250;
+
+    let cable = "Consulte";
+    const cableTable = isThreePhase
+        ? { "2.5": 21, "4": 28, "6": 36, "10": 50, "16": 68, "25": 89, "35": 111, "50": 134, "70": 171, "95": 207 }
+        : { "2.5": 24, "4": 32, "6": 41, "10": 57, "16": 76, "25": 101, "35": 125 };
+
+    for (const [bitola, amp] of Object.entries(cableTable)) {
+        if (amp * inputs.groupingFactor >= breaker) {
+            cable = bitola + " mm²";
+            break;
+        }
     }
 
-    const breakerTier1 = standardBreakers.find(size => size >= (acCurrent * 1.15));
-    let cableTier1 = 'Consulte';
-    for (const size of cableSizes) { if (cableAmpacityFromNBR[size] >= breakerTier1) { cableTier1 = `${size}mm²`; break; } }
-
-    const breakerTier2 = standardBreakers.find(size => size >= (acCurrent * 1.2));
-    let cableTier2 = 'Consulte';
-    for (const size of cableSizes) { if (cableAmpacityFromNBR[size] >= breakerTier2) { cableTier2 = `${size}mm²`; break; } }
-
-    return `
-        <h3 class="text-xl font-bold text-white mb-3">Dimensionamento Lado CA (por Inversor)</h3>
-        <p class="text-sm text-gray-400 mb-2">Corrente de Saída CA Aproximada: <span class="font-bold text-gray-200">${acCurrent.toFixed(2)} A</span></p>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div class="bg-gray-900/50 p-4 rounded-lg">
-                <h4 class="font-bold text-sky-400">Opção 1 (Premium: Schneider, Siemens)</h4>
-                <p class="mt-2 text-gray-300"><strong class="text-gray-400">Disjuntor:</strong> <span class="font-bold text-white">${breakerType} ${breakerTier1} A</span></p>
-                <p class="text-gray-300"><strong class="text-gray-400">Cabeamento:</strong> <span class="font-bold text-white">${cableTier1}</span></p>
-            </div>
-            <div class="bg-gray-900/50 p-4 rounded-lg">
-                <h4 class="font-bold text-sky-400">Opção 2 (Entrada: Steck, WEG, JG)</h4>
-                <p class="mt-2 text-gray-300"><strong class="text-gray-400">Disjuntor:</strong> <span class="font-bold text-white">${breakerType} ${breakerTier2} A</span></p>
-                <p class="text-gray-300"><strong class="text-gray-400">Cabeamento:</strong> <span class="font-bold text-white">${cableTier2}</span></p>
-            </div>
-        </div>`;
-}
-
-function generateVoltageDropHTML(inputs) {
-    const { moduleCount, inverterCount, mpptCount, stringsPerMppt, moduleVmp, moduleImp, cableDistance, dcCableSize } = inputs;
-    const modulesPerInverter = moduleCount / inverterCount;
-    const totalStringsPerInverter = mpptCount * stringsPerMppt;
-    const baseModulesPerString = Math.floor(modulesPerInverter / totalStringsPerInverter);
-    const remainderModules = modulesPerInverter % totalStringsPerInverter;
-    const longestStringLength = baseModulesPerString + (remainderModules > 0 ? 1 : 0);
-
-    const COPPER_RESISTIVITY = 0.0172;
-    const stringVmp = longestStringLength * moduleVmp;
-    const stringImp = moduleImp;
-    const totalWireLength = 2 * cableDistance;
-    const cableResistance = (COPPER_RESISTIVITY * totalWireLength) / dcCableSize;
-    const voltageDropV = stringImp * cableResistance;
-    const voltageDropPercent = (voltageDropV / stringVmp) * 100;
-
-    let statusClass = 'bg-red-900/70 text-red-300', statusText = `REPROVADO (> 2%)`;
-    if (voltageDropPercent <= 2) {
-        statusClass = 'bg-green-900/50 text-green-300';
-        statusText = 'APROVADO';
-    }
-
-    return `
-        <div class="mt-4 p-4 rounded-lg bg-gray-900/50">
-            <h4 class="font-bold text-sky-400">Análise de Queda de Tensão CC</h4>
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-2 text-sm">
-                <p><strong class="text-gray-400 block">Cabo Testado</strong><span class="font-semibold text-white">${dcCableSize}mm² @ ${cableDistance}m</span></p>
-                <p><strong class="text-gray-400 block">Pior Caso (String)</strong><span class="font-semibold text-white">${longestStringLength} módulos</span></p>
-                <p><strong class="text-gray-400 block">Queda de Tensão</strong><span class="font-semibold text-white">${voltageDropV.toFixed(2)} V (${voltageDropPercent.toFixed(2)}%)</span></p>
-                <div class="p-2 text-center rounded ${statusClass} flex items-center justify-center"><strong class="font-bold">${statusText}</strong></div>
-            </div>
-        </div>`;
-}
-
-function generateReportHTML({ inputs, monthlyGeneration, totalAnnualGeneration, modulesPerInverter, powerRatioPercent, minModulesString, maxModulesString, vocCorrected }) {
-    let overloadWarningHTML = '';
-    if ((powerRatioPercent / 100) > (1 + (inputs.overload / 100))) {
-        overloadWarningHTML = `<div class="bg-yellow-900/70 text-yellow-300 p-4 rounded-lg mt-4"><strong class="font-bold">Aviso de Overload:</strong> O overload calculado (${powerRatioPercent.toFixed(1)}%) excede o limite de ${inputs.overload}% definido.</div>`;
-    }
-    const acSizingHTML = generateACSizingHTML(inputs.inverterPower, inputs.gridType);
-    let dcSizingHTML = `<h3 class="text-xl font-bold text-white mt-4 mb-3">Dimensionamento Lado CC (por Inversor)</h3><div class="space-y-3 text-sm"><div class="bg-green-900/50 text-green-300 p-4 rounded-lg"><strong class="font-bold text-base">Range Válido por String:</strong> Entre <strong class="text-white">${minModulesString}</strong> e <strong class="text-white">${maxModulesString}</strong> módulos.</div><p><strong class="text-gray-400">Tensão Máx. String (Frio):</strong> <strong class="text-white">${(maxModulesString * vocCorrected).toFixed(2)}V</strong> (Limite: ${inputs.inverterMaxV}V)</p></div>`;
+    // -- Queda de Tensão --
+    let vDropHTML = '';
     if (inputs.enableVdropCalc) {
-        dcSizingHTML += generateVoltageDropHTML(inputs);
+        vDropHTML = generateVoltageDropHTML(inputs, data.maxModulesString || 12);
     }
-    const arrangementHTML = generateArrangementHTML(inputs);
-    const generationHTML = `<div class="mt-6 h-80 relative"><canvas id="generationChart"></canvas></div>` + generateGenerationTableHTML(monthlyGeneration);
+
+    // -- Montagem do HTML --
     return `
-        <div id="textResults">
-            <h2 class="text-2xl font-bold text-white mb-4">Resultado da Validação Técnica</h2>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
-                <p><strong class="text-gray-400 block">Configuração por Inversor:</strong> <span class="text-lg font-semibold">${modulesPerInverter} módulos de ${inputs.modulePower}Wp</span></p>
-                <p><strong class="text-gray-400 block">Overload (Ratio) Calculado:</strong> <span class="text-lg font-semibold">${powerRatioPercent.toFixed(1)}%</span></p>
-            </div>
-            ${overloadWarningHTML}<hr class="border-gray-700 my-4">${acSizingHTML}${dcSizingHTML}${arrangementHTML}
+    <div id="textResults" class="animate-fade-in space-y-6">
+        
+        <h2 class="text-2xl font-bold text-white mb-2">Resultado da Validação</h2>
+        <div class="flex gap-8 text-sm mb-4">
+            <div><span class="text-gray-400">Total Módulos:</span> <strong class="text-white text-lg">${inputs.moduleCount} (${inputs.modulePower}Wp)</strong></div>
+            <div><span class="text-gray-400">Overload:</span> <strong class="text-white text-lg">${powerRatioPercent.toFixed(1)}%</strong></div>
         </div>
-        ${generationHTML}
-        <div class="mt-8"><button id="pdf-button" onclick="generatePdf()" class="w-full cta-button green">Gerar Relatório Técnico</button></div>`;
+
+        <div>
+            <h3 class="text-lg font-bold text-white mb-2">Dimensionamento CA (Profissional)</h3>
+            <div class="bg-gray-800 rounded-lg p-5 border border-gray-700 shadow-lg grid grid-cols-2 md:grid-cols-4 gap-6">
+                <div><p class="text-xs text-gray-400">Corrente Nominal</p><p class="text-2xl font-bold text-white">${nominalCurrent.toFixed(1)} A</p></div>
+                <div><p class="text-xs text-gray-400">Projeto (+25%)</p><p class="text-2xl font-bold text-white">${projectCurrent.toFixed(1)} A</p></div>
+                <div><p class="text-xs text-gray-400">Disjuntor</p><p class="text-2xl font-bold text-sky-400">${breaker} A</p></div>
+                <div><p class="text-xs text-gray-400">Cabo (FCA ${inputs.groupingFactor})</p><p class="text-2xl font-bold text-green-400">${cable}</p></div>
+            </div>
+        </div>
+
+        <div>
+            <h3 class="text-lg font-bold text-white mb-2">Dimensionamento Lado CC</h3>
+            
+            <div class="bg-green-900/40 border border-green-600/50 p-3 rounded mb-2 flex items-center gap-2">
+                <i class='bx bxs-check-circle text-green-400 text-xl'></i>
+                <div><strong class="text-green-400 block">Configuração Válida</strong><span class="text-gray-300 text-sm">Dentro dos limites. Max Tensão: ${maxVStringGlobal.toFixed(1)}V</span></div>
+            </div>
+            
+            ${vDropHTML}
+
+            <div class="bg-gray-800/50 rounded-lg p-6 border border-gray-700 mt-4 overflow-x-auto">
+                <h4 class="text-white font-bold mb-6 border-b border-gray-700 pb-2">Arranjo Fotovoltaico (Diagrama Unifilar)</h4>
+                
+                <div class="flex items-stretch min-w-[600px]">
+                    <div class="flex-grow space-y-6 flex flex-col justify-center py-4">
+                        ${generateVisualStrings(distribution)}
+                    </div>
+                    <div class="w-2 bg-green-500 mx-6 relative rounded-full shadow-[0_0_15px_rgba(34,197,94,0.6)] z-10">
+                        <div class="absolute top-1/2 right-0 w-6 h-1 bg-green-500"></div>
+                    </div>
+                    <div class="w-40 flex items-center justify-start">
+                         <div class="bg-gray-700 border-2 border-gray-500 text-gray-300 font-bold p-4 rounded-lg text-center shadow-2xl relative">
+                            <i class='bx bx-server text-3xl mb-1 text-amber-500'></i>
+                            <div class="text-xs uppercase text-gray-400">Inversor</div>
+                            <div class="text-lg text-white">${(inputs.inverterPower/1000).toFixed(1)} kW</div>
+                            <div class="absolute top-1/2 -left-2 w-3 h-3 bg-green-500 rounded-full transform -translate-y-1/2"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            ${generateMPPTTable(distribution, inputs)}
+
+        </div>
+
+        <div class="mt-8">
+             <h3 class="text-center text-white font-bold mb-2">Estimativa: ${totalAnnualGeneration.toFixed(0)} kWh/ano</h3>
+             <div class="h-64 relative bg-gray-800/30 rounded p-2 mb-6"><canvas id="generationChart"></canvas></div>
+             ${generateMonthlyTable(monthlyGeneration)}
+             <button onclick="generatePdf()" class="w-full mt-6 bg-green-600 hover:bg-green-500 text-white font-bold py-3 rounded shadow-lg transition">Gerar PDF Técnico</button>
+        </div>
+    </div>`;
 }
 
-function generateArrangementHTML(inputs) {
-    let html = '';
-    const modulesPerInverter = inputs.moduleCount / inputs.inverterCount;
-    const totalStringsPerInverter = inputs.mpptCount * inputs.stringsPerMppt;
-    const baseModulesPerString = Math.floor(modulesPerInverter / totalStringsPerInverter);
-    const remainderModules = modulesPerInverter % totalStringsPerInverter;
-    const mpptLayout = []; let remainderCounter = remainderModules;
-    for (let i = 0; i < inputs.mpptCount; i++) {
-        const stringsInMppt = [];
-        for (let j = 0; j < inputs.stringsPerMppt; j++) { stringsInMppt.push(baseModulesPerString + (remainderCounter > 0 ? 1 : 0)); if (remainderCounter > 0) remainderCounter--; }
-        mpptLayout.push({ strings: stringsInMppt });
-    }
-    for (let i = 0; i < inputs.inverterCount; i++) {
-        html += `<h3 class="text-xl font-bold text-white mt-6 mb-3">Arranjo e Diagrama - Inversor ${i + 1} de ${inputs.inverterCount}</h3>`;
-        let arrangementSuggestion = `<p>Sugestão de arranjo balanceado:</p><ul class="list-disc list-inside">`;
-        mpptLayout.forEach((mppt, mpptIdx) => { arrangementSuggestion += `<li>MPPT ${mpptIdx + 1}: ${mppt.strings.length} string(s) com ${mppt.strings.join(' e ')} módulos.</li>`; });
-        html += `<div class="bg-gray-700 p-4 rounded-lg text-sm">${arrangementSuggestion}</ul></div>`;
-        if (inputs.stringsPerMppt === 1 && inputs.mpptCount <= 2) { html += generateSimpleSvgDiagram({ mpptLayout }, inputs.inverterPower); }
-        else { html += generateComplexSvgDiagram({ mpptLayout }, inputs.inverterPower); }
-    }
-    return html;
+// -- Função para desenhar os Módulos Azuis (Igual ao Print) --
+function generateVisualStrings(distribution) {
+    return distribution.map((d, index) => {
+        if (d.numStrings === 0) return '';
+
+        // --- LOOP DAS STRINGS (Linhas Paralelas Independentes) ---
+        const stringsRows = Array(d.numStrings).fill(0).map((_, strIndex) => {
+
+            // Desenha os módulos (quadradinhos azuis)
+            const modulesHTML = Array(d.modulesPerString).fill(0).map(() =>
+                `<div class="w-8 h-12 bg-blue-600 rounded-sm border border-blue-400 shadow-sm relative group hover:bg-blue-500 transition-colors" title="Módulo FV">
+                    <div class="absolute top-1/2 left-0 w-full h-[1px] bg-blue-300/50"></div>
+                 </div>`
+            ).join('');
+
+            return `
+            <div class="flex items-center mb-3 last:mb-0 relative">
+                <div class="relative w-6 h-12 mr-2 shrink-0 opacity-70">
+                     <div class="absolute top-[40%] w-full h-[2px] bg-red-500"></div>
+                     <div class="absolute top-[60%] w-full h-[2px] bg-gray-900"></div>
+                </div>
+
+                <div class="flex gap-1 z-10 flex-nowrap mr-2">
+                    ${modulesHTML}
+                </div>
+
+                <div class="flex-grow h-[2px] bg-red-500 relative shadow-[0_0_5px_rgba(239,68,68,0.5)] mt-[-6px] opacity-80 min-w-[40px]">
+                    <i class='bx bxs-right-arrow text-red-500 text-[8px] absolute right-0 top-1/2 -translate-y-1/2'></i>
+                </div>
+            </div>`;
+        }).join('');
+
+        // --- RETORNO DO BLOCO DA MPPT ---
+        return `
+        <div class="flex border-b border-gray-700/50 pb-6 mb-6 last:border-0 last:mb-0 last:pb-0 relative">
+            
+            <div class="w-24 flex flex-col justify-center items-end pr-5 shrink-0 border-r border-gray-700/50 mr-4">
+                <span class="text-amber-500 font-bold text-lg leading-tight">MPPT ${index + 1}</span>
+                <span class="text-xs text-gray-400 mt-1 bg-gray-800 px-2 py-1 rounded border border-gray-600">
+                    ${d.numStrings} string${d.numStrings > 1 ? 's' : ''}
+                </span>
+            </div>
+
+            <div class="flex-grow flex flex-col justify-center w-full">
+                ${stringsRows}
+            </div>
+        </div>`;
+    }).join('');
 }
 
-function generateSimpleSvgDiagram(arrangement, inverterPower) {
-    const mpptLayout = arrangement.mpptLayout; const inverterLabel = `Inversor ${inverterPower / 1000}kW`; let svgElements = ''; let currentY = 30;
-    const moduleWidth = 40, moduleHeight = 60, moduleSpacingX = 5, mpptSpacingY = 40, mpptLabelOffset = 30, inverterWidth = 100, inverterHeight = 80, inverterConnectionOffset = 20;
-    svgElements += `<defs><linearGradient id="moduleGradient" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#3b82f6" /><stop offset="100%" stop-color="#2563eb" /></linearGradient></defs>`;
-    const maxModulesInString = Math.max(0, ...mpptLayout.flatMap(mppt => mppt.strings)); const modulesSectionWidth = mpptLabelOffset + (maxModulesInString * (moduleWidth + moduleSpacingX));
-    const inverterX = modulesSectionWidth + inverterConnectionOffset; const svgWidth = inverterX + inverterWidth + 20; let mpptMidYPoints = [];
-    mpptLayout.forEach((mppt, mpptIndex) => {
-        const modulesPerString = mppt.strings[0]; const mpptY = currentY; const mpptMidY = mpptY + moduleHeight / 2; mpptMidYPoints.push(mpptMidY);
-        svgElements += `<text x="${mpptLabelOffset - 15}" y="${mpptMidY}" class="label mppt-label-text">${mpptIndex + 1}</text>`; let currentX = mpptLabelOffset;
-        for (let j = 0; j < modulesPerString; j++) {
-            svgElements += `<rect x="${currentX}" y="${mpptY}" width="${moduleWidth}" height="${moduleHeight}" rx="4" ry="4" class="module" />`;
-            if (j > 0) { svgElements += `<line x1="${currentX - moduleSpacingX}" y1="${mpptMidY}" x2="${currentX}" y2="${mpptMidY}" class="wire wire-pos" />`; }
-            currentX += moduleWidth + moduleSpacingX;
-        }
-        const mpptEndX = currentX - moduleSpacingX;
-        svgElements += `<text x="${mpptLabelOffset + 5}" y="${mpptMidY}" class="label polo-pos">+</text><text x="${mpptEndX - 5}" y="${mpptMidY}" class="label polo-neg">-</text>`;
-        svgElements += `<line x1="${mpptEndX}" y1="${mpptMidY}" x2="${inverterX - inverterConnectionOffset / 2}" y2="${mpptMidY}" class="wire" />`; currentY += moduleHeight + mpptSpacingY;
+// -- Função da Tabela Mensal (Estilo Cinza e Branco) --
+function generateMonthlyTable(data) {
+    const months = ['JAN','FEV','MAR','ABR','MAI','JUN','JUL','AGO','SET','OUT','NOV','DEZ'];
+    let header = '', body = '';
+    data.forEach((val, i) => {
+        header += `<th class="py-3 px-2 text-xs font-bold text-gray-400 uppercase tracking-wider">${months[i]}</th>`;
+        body += `<td class="py-3 px-2 text-sm font-bold text-white border-t border-gray-700">${val.toFixed(0)}</td>`;
     });
-    const totalDrawingHeight = currentY - mpptSpacingY; const inverterY = (totalDrawingHeight - inverterHeight) / 2 + 15;
-    if (mpptMidYPoints.length > 0) {
-        const firstMpptY = mpptMidYPoints[0]; const lastMpptY = mpptMidYPoints[mpptMidYPoints.length - 1];
-        svgElements += `<line x1="${inverterX - inverterConnectionOffset / 2}" y1="${firstMpptY}" x2="${inverterX - inverterConnectionOffset / 2}" y2="${lastMpptY}" class="wire wire-green" />`;
-        svgElements += `<line x1="${inverterX - inverterConnectionOffset / 2}" y1="${inverterY + inverterHeight / 2}" x2="${inverterX}" y2="${inverterY + inverterHeight / 2}" class="wire wire-green" />`;
-        mpptMidYPoints.forEach(midY => { svgElements += `<line x1="${mpptLabelOffset}" y1="${midY}" x2="${inverterX - inverterConnectionOffset / 2}" y2="${midY}" class="wire wire-pos" />`; });
+    return `
+    <div class="overflow-hidden rounded-lg border border-gray-700 bg-gray-800 shadow-md">
+        <h4 class="px-4 py-3 bg-gray-900 text-white font-bold text-sm border-b border-gray-700">Detalhes da Geração Mensal (kWh)</h4>
+        <div class="overflow-x-auto">
+            <table class="w-full text-center min-w-[600px]">
+                <thead class="bg-gray-900/50"><tr>${header}</tr></thead>
+                <tbody><tr>${body}</tr></tbody>
+            </table>
+        </div>
+    </div>`;
+}
+
+// -- Queda de Tensão (Opcional) --
+function generateVoltageDropHTML(inputs, stringLength) {
+    if(!inputs.moduleImp || !inputs.moduleVmp || !stringLength) return '';
+
+    const dist = inputs.cableDistance || 0;
+    const bitola = inputs.dcCableSize || 6;
+    const rho = 0.0172;
+
+    // Cálculos
+    const resistencia = (rho * 2 * dist) / bitola;
+    const vDrop = resistencia * inputs.moduleImp;
+    const vString = inputs.moduleVmp * stringLength;
+    const percent = (vDrop / vString) * 100;
+
+    // Cores e Ícones
+    if (percent < 2) {
+        // Estado IDEAL (Verde)
+        colorClass = 'text-green-400';
+        barColor = 'bg-green-500';
+        statusLabel = '<span class="text-xs bg-green-900/30 text-green-400 px-3 py-1 rounded border border-green-800/50 font-bold">IDEAL</span>';
+    } else if (percent < 3) {
+        // Estado ATENÇÃO (Amarelo)
+        colorClass = 'text-yellow-400';
+        barColor = 'bg-yellow-500';
+        statusLabel = '<span class="text-xs bg-yellow-900/30 text-yellow-400 px-3 py-1 rounded border border-yellow-800/50 font-bold">ATENÇÃO</span>';
+    } else {
+        // Estado CRÍTICO (Vermelho)
+        colorClass = 'text-red-400';
+        barColor = 'bg-red-500';
+        statusLabel = '<span class="text-xs bg-red-900/50 text-red-400 px-3 py-1 rounded border border-red-800 font-bold">CRÍTICO</span>';
     }
-    svgElements += `<rect x="${inverterX}" y="${inverterY}" width="${inverterWidth}" height="${inverterHeight}" class="inverter" /><text x="${inverterX + inverterWidth / 2}" y="${inverterY + inverterHeight / 2 + 4}" class="label inverter-label">${inverterLabel}</text>`;
-    return `<div class="bg-gray-900/70 p-4 rounded-lg overflow-x-auto"><svg width="${svgWidth}" height="${totalDrawingHeight + 30}" xmlns="http://www.w3.org/2000/svg"><style>.module{fill:url(#moduleGradient);stroke:#60a5fa;stroke-width:1.5}.inverter{fill:#334155;stroke:#64748b;stroke-width:2;rx:8;ry:8}.wire{stroke:#94a3b8;stroke-width:2;fill:none}.wire-pos{stroke:#f87171;stroke-width:2}.wire-green{stroke:#4ade80;stroke-width:2}.label{font-family:sans-serif;font-size:12px;fill:#e5e7eb;text-anchor:middle;dominant-baseline:central}.mppt-label-text{font-weight:bold;fill:#61dafb;font-size:16px}.inverter-label{font-size:14px;font-weight:bold;fill:#cbd5e1}.polo-pos{fill:#f87171;font-weight:bold;font-size:16px}.polo-neg{fill:#94a3b8;font-weight:bold;font-size:16px}</style>${svgElements}</svg></div>`;
-}
 
-function generateComplexSvgDiagram(arrangement, inverterPower) {
-    const mpptLayout = arrangement.mpptLayout; const moduleWidth = 40, moduleHeight = 60, moduleSpacingX = 5, stringSpacingY = 15, mpptSpacingY = 30, mpptLabelOffset = 60;
-    const inverterWidth = 100, inverterHeight = 80, inverterMarginRight = 60; const inverterLabel = `Inversor ${inverterPower / 1000}kW`; let svgElements = '', currentY = 30;
-    svgElements += `<defs><linearGradient id="moduleGradient" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#3b82f6" /><stop offset="100%" stop-color="#2563eb" /></linearGradient></defs>`;
-    const maxModulesInString = Math.max(0, ...mpptLayout.flatMap(mppt => mppt.strings)); const contentWidth = mpptLabelOffset + (maxModulesInString * (moduleWidth + moduleSpacingX));
-    const svgWidth = contentWidth + inverterWidth + inverterMarginRight + 40; const busX = contentWidth + 40; let mpptBusCollectorPoints = [];
-    mpptLayout.forEach((mppt, mpptIndex) => {
-        const mpptStartY = currentY; const numStrings = mppt.strings.length; let mpptBusYPoints = [];
-        svgElements += `<text x="${mpptLabelOffset - 50}" y="${mpptStartY + ((numStrings * (moduleHeight + stringSpacingY)) / 2) - (stringSpacingY / 2)}" class="label mppt-label-text">MPPT ${mpptIndex + 1}</text>`;
-        mppt.strings.forEach(modulesPerString => {
-            const stringY = currentY; const stringMidY = stringY + moduleHeight / 2; const diff = maxModulesInString - modulesPerString; const offsetX = diff * (moduleWidth + moduleSpacingX);
-            const stringStartX = mpptLabelOffset + offsetX; let currentX = stringStartX;
-            for (let j = 0; j < modulesPerString; j++) { svgElements += `<rect x="${currentX}" y="${stringY}" width="${moduleWidth}" height="${moduleHeight}" rx="4" ry="4" class="module" />`; if (j > 0) svgElements += `<line x1="${currentX - moduleSpacingX}" y1="${stringMidY}" x2="${currentX}" y2="${stringMidY}" class="wire" />`; currentX += moduleWidth + moduleSpacingX; }
-            const stringEndX = currentX - moduleSpacingX; const mpptBusEndX = contentWidth - moduleSpacingX + 15;
-            svgElements += `<line x1="${stringStartX}" y1="${stringMidY}" x2="${stringStartX - 15}" y2="${stringMidY}" class="wire wire-pos" />`;
-            svgElements += `<line x1="${stringEndX}" y1="${stringMidY}" x2="${mpptBusEndX}" y2="${stringMidY}" class="wire" />`;
-            svgElements += `<text x="${stringStartX + 5}" y="${stringMidY}" class="label polo-pos">+</text><text x="${stringEndX - 5}" y="${stringMidY}" class="label polo-neg">-</text>`; mpptBusYPoints.push(stringMidY); currentY += moduleHeight + stringSpacingY;
-        });
-        const mpptBusStartX = mpptLabelOffset - 15; const mpptBusEndX = contentWidth - moduleSpacingX + 15; const busLineStartY = mpptBusYPoints[0]; const busLineEndY = mpptBusYPoints[mpptBusYPoints.length - 1];
-        svgElements += `<line x1="${mpptBusStartX}" y1="${busLineStartY}" x2="${mpptBusStartX}" y2="${busLineEndY}" class="wire wire-pos" />`; svgElements += `<line x1="${mpptBusEndX}" y1="${busLineStartY}" x2="${mpptBusEndX}" y2="${busLineEndY}" class="wire" />`;
-        const mpptMidPointY = (busLineStartY + busLineEndY) / 2; mpptBusCollectorPoints.push({ x: mpptBusStartX, y: mpptMidPointY, type: 'pos' }); mpptBusCollectorPoints.push({ x: mpptBusEndX, y: mpptMidPointY, type: 'neg' });
-        currentY += mpptSpacingY - stringSpacingY;
-    });
-    const totalDrawingHeight = currentY - mpptSpacingY; const inverterY = (totalDrawingHeight - inverterHeight) / 2, inverterX = busX + 20;
-    mpptBusCollectorPoints.forEach(point => { svgElements += `<line x1="${point.x}" y1="${point.y}" x2="${busX}" y2="${point.y}" class="wire ${point.type === 'pos' ? 'wire-pos' : ''}" />`; });
-    const busStartY = mpptBusCollectorPoints.length > 0 ? mpptBusCollectorPoints.map(p => p.y).reduce((a, b) => Math.min(a, b), Infinity) : 0; const busEndY = mpptBusCollectorPoints.length > 0 ? mpptBusCollectorPoints.map(p => p.y).reduce((a, b) => Math.max(a, b), -Infinity) : 0;
-    if (mpptLayout.length > 0) {
-        svgElements += `<line x1="${busX}" y1="${busStartY}" x2="${busX}" y2="${busEndY}" class="wire-bus" />`;
-        svgElements += `<line x1="${busX}" y1="${inverterY + inverterHeight / 2}" x2="${inverterX}" y2="${inverterY + inverterHeight / 2}" class="wire-to-inverter" />`;
+    // Barra de progresso (Escala até 5%)
+    const barWidth = Math.min((percent / 5) * 100, 100);
+
+    return `
+    <div class="mt-4 bg-gray-800 rounded-lg border border-gray-700 shadow-md overflow-hidden">
+        
+        <div class="bg-gray-900/50 px-5 py-3 border-b border-gray-700 flex justify-between items-center">
+            <h4 class="text-sm font-bold text-gray-300 uppercase flex items-center gap-2">
+                <i class='bx bx-trending-down text-lg'></i> Análise de Queda de Tensão
+            </h4>
+            ${statusLabel}
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-gray-700 p-5 items-center">
+            
+            <div class="flex flex-col justify-center space-y-4 px-2">
+                <div class="flex justify-between items-center">
+                    <span class="text-sm text-gray-400 font-medium">Distância (x2)</span>
+                    <span class="text-base font-bold text-white flex items-center gap-2">
+                        <i class='bx bx-ruler text-gray-500'></i> ${dist}m
+                    </span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-sm text-gray-400 font-medium">Bitola Cabo</span>
+                    <span class="text-base font-bold text-amber-400 flex items-center gap-2">
+                        <i class='bx bx-cable text-amber-600'></i> ${bitola}mm²
+                    </span>
+                </div>
+            </div>
+
+            <div class="flex flex-col items-center justify-center px-2 py-4 md:py-0">
+                <span class="text-xs uppercase text-gray-500 font-bold mb-1 tracking-wider">Queda em Volts</span>
+                <span class="text-3xl font-mono text-gray-200 font-bold">${vDrop.toFixed(2)} <span class="text-lg text-gray-500">V</span></span>
+                <span class="text-xs text-gray-500 mt-1">Resistência R = ${resistencia.toFixed(3)} Ω</span>
+            </div>
+
+            <div class="flex flex-col justify-center px-2 pt-2 md:pt-0">
+                <div class="flex justify-between items-end mb-2">
+                    <span class="text-xs uppercase text-gray-500 font-bold tracking-wider">Impacto %</span>
+                    <span class="text-3xl font-bold ${colorClass}">${percent.toFixed(2)}%</span>
+                </div>
+                
+                <div class="w-full bg-gray-900 rounded-full h-3 border border-gray-700 relative overflow-hidden">
+                    <div class="${barColor} h-full rounded-full transition-all duration-500" style="width: ${barWidth}%"></div>
+                </div>
+                
+                <div class="flex justify-between text-[10px] text-gray-500 mt-1 font-mono">
+                    <span>0%</span>
+                    <span>Limite: 2%</span>
+                    <span>Crítico: 5%</span>
+                </div>
+            </div>
+
+        </div>
+    </div>`;
+}
+// UTILIDADES
+function clearData() { if(confirm('Limpar?')) { document.getElementById('solar-form').reset(); document.getElementById('results').classList.add('hidden'); } }
+function createGenerationChart(d,t) {
+    const ctx=document.getElementById('generationChart').getContext('2d');
+    if(generationChartInstance) generationChartInstance.destroy();
+    generationChartInstance=new Chart(ctx,{type:'bar',data:{labels:['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'],datasets:[{label:'kWh',data:d,backgroundColor:'#3b82f6',borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{grid:{color:'#374151'},ticks:{color:'#9ca3af'}},x:{grid:{display:false},ticks:{color:'#9ca3af'}}}}});
+}
+function showToast(message, type = 'success') {
+    let container = document.getElementById('toast-container');
+    if (!container) {
+        container = document.createElement('div');
+        container.id = 'toast-container';
+        container.className = 'fixed top-5 right-5 z-50 flex flex-col gap-3'; // Aumentei o gap
+        document.body.appendChild(container);
     }
-    return `<div class="bg-gray-900/70 p-4 rounded-lg overflow-x-auto"><svg width="${svgWidth}" height="${totalDrawingHeight + 20}" xmlns="http://www.w3.org/2000/svg"><style>.module{fill:url(#moduleGradient);stroke:#60a5fa;stroke-width:1.5}.inverter{fill:#334155;stroke:#64748b;stroke-width:2;rx:8;ry:8}.wire{stroke:#94a3b8;stroke-width:2;fill:none}.wire-pos{stroke:#f87171}.wire-bus{stroke:#4ade80;stroke-width:4}.wire-to-inverter{stroke:#e5e7eb;stroke-width:3}.label{font-family:sans-serif;font-size:12px;fill:#e5e7eb;text-anchor:middle;dominant-baseline:central}.mppt-label-text{font-weight:bold;text-anchor:end;fill:#61dafb;font-size:13px}.inverter-label{font-size:14px;font-weight:bold;fill:#cbd5e1}.polo-pos{fill:#f87171;font-weight:bold;font-size:16px}.polo-neg{fill:#94a3b8;font-weight:bold;font-size:16px}</style>${svgElements}<rect x="${inverterX}" y="${inverterY}" width="${inverterWidth}" height="${inverterHeight}" class="inverter" /><text x="${inverterX + inverterWidth / 2}" y="${inverterY + inverterHeight / 2 + 4}" class="label inverter-label">${inverterLabel}</text></svg></div>`;
+
+    // Cria o elemento
+    const el = document.createElement('div');
+
+    // Define as cores e ícones baseados no tipo
+    const styles = type === 'success'
+        ? 'bg-gray-800 border-l-4 border-green-500 text-green-100 shadow-[0_0_15px_rgba(34,197,94,0.3)]'
+        : 'bg-gray-800 border-l-4 border-red-500 text-red-100 shadow-[0_0_15px_rgba(239,68,68,0.3)]';
+
+    const icon = type === 'success'
+        ? "<i class='bx bxs-check-circle text-2xl text-green-500'></i>"
+        : "<i class='bx bxs-error-circle text-2xl text-red-500'></i>";
+
+    el.className = `${styles} px-6 py-4 rounded-r shadow-2xl flex items-center gap-4 min-w-[300px] toast-enter relative overflow-hidden`;
+
+    // Adiciona o conteúdo
+    el.innerHTML = `
+        ${icon}
+        <div>
+            <h4 class="font-bold text-sm uppercase tracking-wide">${type === 'success' ? 'Sucesso' : 'Erro'}</h4>
+            <span class="text-sm opacity-90">${message}</span>
+        </div>
+        <div class="absolute bottom-0 left-0 h-1 ${type === 'success' ? 'bg-green-500' : 'bg-red-500'} transition-all duration-[3000ms] ease-linear w-full" style="width: 100%"></div>
+    `;
+
+    container.appendChild(el);
+
+    // Anima a barrinha de tempo diminuindo
+    setTimeout(() => {
+        const bar = el.querySelector('div:last-child');
+        if(bar) bar.style.width = '0%';
+    }, 50);
+
+    // Remove depois de 3 segundos
+    setTimeout(() => {
+        el.classList.replace('toast-enter', 'toast-exit'); // Troca entrada por saída
+        // Espera a animação de saída terminar (400ms) para remover do HTML
+        el.addEventListener('animationend', () => el.remove());
+    }, 3000);
 }
+function generatePdf() { alert('Função de PDF.'); }
 
-// --- FUNÇÕES DE UTILIDADE ---
-
-function clearData() {
-    if (confirm('Tem certeza que deseja limpar os campos do formulário?')) {
-        document.getElementById('solar-form').reset();
-        document.getElementById('results').classList.add('hidden');
-        document.getElementById('save-button').classList.add('hidden');
-    }
-}
-
-function createGenerationChart(generationData, totalAnnualGeneration) {
-    const chartEl = document.getElementById('generationChart');
-    if (!chartEl) return;
-    const ctx = chartEl.getContext('2d');
-    if (generationChartInstance) generationChartInstance.destroy();
-    generationChartInstance = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
-            datasets: [{
-                label: 'Geração Mensal (kWh)',
-                data: generationData,
-                backgroundColor: 'rgba(59, 130, 246, 0.7)',
-                borderColor: 'rgba(96, 165, 250, 1)',
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                title: {
-                    display: true,
-                    text: `Estimativa de Geração Anual: ${totalAnnualGeneration.toFixed(0)} kWh`,
-                    color: '#e5e7eb',
-                    font: {
-                        size: 18
-                    }
-                },
-                legend: {
-                    labels: {
-                        color: '#d1d5db'
-                    }
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    title: {
-                        display: true,
-                        text: 'Energia Gerada (kWh)',
-                        color: '#9ca3af'
-                    },
-                    ticks: {
-                        color: '#d1d5db'
-                    },
-                    grid: {
-                        color: 'rgba(156, 163, 175, 0.2)'
-                    }
-                },
-                x: {
-                    ticks: {
-                        color: '#d1d5db'
-                    },
-                    grid: {
-                        color: 'rgba(156, 163, 175, 0.1)'
-                    }
-                }
-            }
-        }
-    });
-}
-
-function generateGenerationTableHTML(monthlyData) {
-    const months = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
-    let tableHTML = `<h3 class="text-xl font-bold text-white mt-8 mb-3">Detalhes da Geração Mensal (kWh)</h3><div class="overflow-x-auto relative rounded-lg bg-gray-900/50"><table class="w-full text-sm text-center text-gray-400"><thead class="text-xs text-gray-300 uppercase bg-gray-700/50"><tr>`;
-    months.forEach(month => {
-        tableHTML += `<th scope="col" class="py-3 px-4">${month}</th>`;
-    });
-    tableHTML += `</tr></thead><tbody><tr class="border-b border-gray-700">`;
-    monthlyData.forEach(generation => {
-        tableHTML += `<td class="py-4 px-4 font-medium text-gray-100 whitespace-nowrap">${generation.toFixed(1)}</td>`;
-    });
-    tableHTML += `</tr></tbody></table></div>`;
-    return tableHTML;
-}
-
-function generatePdf() {
-    const { jsPDF } = window.jspdf;
-    const resultsToPrint = document.getElementById('results');
-    const pdfButton = document.getElementById('pdf-button');
-    if (pdfButton) {
-        pdfButton.innerText = 'Gerando PDF...';
-        pdfButton.disabled = true;
-        pdfButton.style.display = 'none';
-    }
-    html2canvas(resultsToPrint, {
-        scale: 2,
-        backgroundColor: '#1f2937', // Cor de fundo do container de resultados
-        useCORS: true
-    }).then(canvas => {
-        const imgData = canvas.toDataURL('image/png');
-        const pdf = new jsPDF('p', 'mm', 'a4');
-        const pdfWidth = pdf.internal.pageSize.getWidth();
-        const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-        pdf.save('relatorio-agilsolar.pdf');
-        if (pdfButton) {
-            pdfButton.style.display = 'block';
-            pdfButton.innerText = 'Gerar Relatório Técnico';
-            pdfButton.disabled = false;
-        }
-    });
-}
-
-// --- INICIALIZAÇÃO DA PÁGINA ---
-function initialize() {
+// INICIALIZAÇÃO
+document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('calculate-button').addEventListener('click', calculate);
     document.getElementById('clear-button').addEventListener('click', clearData);
     document.getElementById('save-button').addEventListener('click', updateProject);
-    document.getElementById('solar-form').addEventListener('submit', (e) => e.preventDefault());
-    document.getElementById('enableVdropCalc').addEventListener('change', function () {
-        document.getElementById('vdrop-inputs').classList.toggle('hidden', !this.checked);
-    });
-    loadProjectData();
-}
+    document.getElementById('solar-form').addEventListener('submit', e=>e.preventDefault());
+    const vDrop=document.getElementById('enableVdropCalc'); if(vDrop)vDrop.addEventListener('change', function(){document.getElementById('vdrop-inputs').classList.toggle('hidden',!this.checked)});
 
-document.addEventListener('DOMContentLoaded', initialize);
+    loadProjectData();
+    loadEquipmentDatabase();
+});
+function generateMPPTTable(distribution, inputs) {
+    // Cabeçalho da Tabela
+    let html = `
+    <div class="mt-6 overflow-hidden rounded-lg border border-gray-700 bg-gray-800 shadow-md">
+        <h4 class="px-4 py-3 bg-gray-900 text-gray-200 font-bold text-sm border-b border-gray-700 flex items-center gap-2">
+            <i class='bx bx-table'></i> Dados Elétricos por MPPT (STC)
+        </h4>
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm text-gray-400">
+                <thead class="bg-gray-900/50 text-xs uppercase text-gray-500 font-bold">
+                    <tr>
+                        <th class="px-4 py-3 text-center">MPPT</th>
+                        <th class="px-4 py-3 text-center">Arranjo</th>
+                        <th class="px-4 py-3 text-center text-sky-400">Tensão (Voc)</th>
+                        <th class="px-4 py-3 text-center text-green-400">Corrente (Isc)</th>
+                        <th class="px-4 py-3 text-center">Potência</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-700">
+    `;
+
+    // Linhas da Tabela
+    let hasData = false;
+    distribution.forEach((d, i) => {
+        if (d.numStrings === 0) return;
+        hasData = true;
+
+        // CÁLCULOS COM VOC E ISC
+        const vocTotal = d.modulesPerString * inputs.moduleVoc; // Tensão de Circuito Aberto Total
+        const iscTotal = d.numStrings * inputs.moduleIsc;       // Corrente de Curto-Circuito Total
+
+        // A potência deve ser calculada pela potência nominal do módulo (Wp),
+        // pois Voc * Isc não representa a potência real de pico.
+        const totalModules = d.numStrings * d.modulesPerString;
+        const powerKw = (totalModules * inputs.modulePower) / 1000;
+
+        html += `
+        <tr class="hover:bg-gray-700/30 transition-colors">
+            <td class="px-4 py-3 text-center font-bold text-amber-500">MPPT ${i + 1}</td>
+            <td class="px-4 py-3 text-center text-gray-300">
+                ${d.numStrings}x ${d.modulesPerString}
+            </td>
+            <td class="px-4 py-3 text-center font-mono text-sky-300">
+                ${vocTotal.toFixed(1)} V
+            </td>
+            <td class="px-4 py-3 text-center font-mono text-green-300">
+                ${iscTotal.toFixed(1)} A
+            </td>
+            <td class="px-4 py-3 text-center font-bold text-white">
+                ${powerKw.toFixed(2)} kWp
+            </td>
+        </tr>`;
+    });
+
+    html += `</tbody></table></div></div>`;
+    return hasData ? html : '';
+}

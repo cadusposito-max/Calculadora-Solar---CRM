@@ -2,157 +2,298 @@
 <html lang="pt-br">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Calculadora Solar</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-  <link rel="stylesheet" href="styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora Solar</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="styles.css">
 </head>
 
 <body class="bg-gray-900 text-gray-100 min-h-screen flex flex-col">
 
-  <header class="bg-gray-900/80 backdrop-blur-sm z-50 border-b border-gray-700">
+<header class="bg-gray-900/80 backdrop-blur-sm z-50 border-b border-gray-700">
     <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
-      <a href="index.html" class="flex items-center text-amber-400 hover:opacity-80 transition-opacity">
-        <i class='bx bxs-calculator text-3xl mr-2'></i>
-        <span class="text-2xl font-bold text-white">Calculadora Solar</span>
-      </a>
-      <div class="flex items-center space-x-4">
-        <a href="perfil.html" class="flex items-center gap-3 hover:bg-gray-700/50 p-2 rounded-lg transition-colors">
-          <div class="text-right hidden sm:block">
-            <span id="header-username" class="font-bold text-white text-sm">Carregando...</span>
-            <p id="user-email" class="text-xs text-gray-400"></p>
-          </div>
-          <img id="header-avatar" src="https://placehold.co/40x40/1F2937/4B5563?text=..."
-            class="w-10 h-10 rounded-full object-cover border-2 border-gray-600">
+        <a href="index.html" class="flex items-center text-amber-400 hover:opacity-80 transition-opacity">
+            <i class='bx bxs-calculator text-3xl mr-2'></i>
+            <span class="text-2xl font-bold text-white">Calculadora Solar</span>
         </a>
-        <button id="logout" class="cta-button outline-amber text-sm py-2 px-4 flex items-center">
-          <i class='bx bx-log-out text-lg mr-2'></i>
-          Sair
-        </button>
-      </div>
+        <div class="flex items-center space-x-4">
+            <a href="perfil.html" class="flex items-center gap-3 hover:bg-gray-700/50 p-2 rounded-lg transition-colors">
+                <div class="text-right hidden sm:block">
+                    <span id="header-username" class="font-bold text-white text-sm">Carregando...</span>
+                    <p id="user-email" class="text-xs text-gray-400"></p>
+                </div>
+                <img id="header-avatar" src="https://placehold.co/40x40/1F2937/4B5563?text=..."
+                     class="w-10 h-10 rounded-full object-cover border-2 border-gray-600">
+            </a>
+            <button id="logout" class="cta-button outline-amber text-sm py-2 px-4 flex items-center">
+                <i class='bx bx-log-out text-lg mr-2'></i>
+                Sair
+            </button>
+        </div>
     </nav>
-  </header>
+</header>
 
-  <main class="flex-grow container mx-auto p-6">
+<main class="flex-grow container mx-auto p-6">
     <div class="w-full max-w-5xl mx-auto">
 
-      <div class="mb-6">
-        <div class="border-b border-gray-700">
-          <nav class="tabs-container flex space-x-2" aria-label="Tabs">
-            <button data-tab-target="#dashboard-content"
-              class="tab-button-chrome tab-active-chrome font-semibold text-sm">
-              Dashboard
-            </button>
-            <button data-tab-target="#projetos-content"
-              class="tab-button-chrome tab-inactive-chrome font-semibold text-sm">
-              Meus Projetos
-            </button>
-          </nav>
-        </div>
-      </div>
-
-      <div id="tabs-content">
-
-        <div id="dashboard-content" class="tab-pane">
-          <div class="mb-10">
-            <h2 class="text-2xl font-bold text-white mb-4">Dashboard Geral</h2>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-              <div class="bg-gray-800 p-5 rounded-lg border border-gray-700">
-                <h3 class="text-sm font-medium text-gray-400">Total de Projetos</h3>
-                <p id="total-projects" class="text-3xl font-bold text-amber-400 mt-2">0</p>
-              </div>
-              <div class="bg-gray-800 p-5 rounded-lg border border-gray-700">
-                <h3 class="text-sm font-medium text-gray-400">Potência Total Instalada</h3>
-                <p id="total-power" class="text-3xl font-bold text-amber-400 mt-2">0 kWp</p>
-              </div>
-              <div class="bg-gray-800 p-5 rounded-lg border border-gray-700">
-                <h3 class="text-sm font-medium text-gray-400">Média por Projeto</h3>
-                <p id="average-power" class="text-3xl font-bold text-amber-400 mt-2">0 kWp</p>
-              </div>
+        <div class="mb-6">
+            <div class="border-b border-gray-700">
+                <nav class="tabs-container flex space-x-2" aria-label="Tabs">
+                    <button data-tab-target="#dashboard-content" class="tab-button-chrome tab-active-chrome font-semibold text-sm">
+                        Dashboard
+                    </button>
+                    <button data-tab-target="#projetos-content" class="tab-button-chrome tab-inactive-chrome font-semibold text-sm">
+                        Meus Projetos
+                    </button>
+                    <button data-tab-target="#novidades-content" class="tab-button-chrome tab-inactive-chrome font-semibold text-sm">
+                        Novidades <span id="news-badge" class="ml-2 bg-amber-500 text-gray-900 text-[10px] font-bold px-1.5 py-0.5 rounded hidden">!</span>
+                    </button>
+                </nav>
             </div>
+        </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div class="bg-gray-800 p-5 rounded-lg border border-gray-700">
-                <h3 class="text-lg font-semibold text-white mb-4">Distribuição por Potência</h3>
-                <div class="max-w-xs mx-auto">
-                  <canvas id="doughnut-chart"></canvas>
+        <div id="tabs-content">
+
+            <div id="dashboard-content" class="tab-pane animate-in fade-in slide-in-from-bottom-4 duration-500">
+
+                <div class="flex flex-col md:flex-row justify-between items-end mb-8 gap-4">
+                    <div>
+                        <h2 class="text-3xl font-bold text-white">
+                            Olá, <span id="welcome-username" class="text-gradient-amber">Engenheiro</span>
+                        </h2>
+                        <p class="text-gray-400 mt-1">Aqui está o resumo da sua operação hoje.</p>
+                    </div>
+                    <div class="text-right hidden md:block">
+                        <p class="text-xs text-gray-500 uppercase font-bold tracking-wider">Data de Hoje</p>
+                        <p class="text-xl text-gray-200 font-mono" id="current-date">--/--/----</p>
+                    </div>
                 </div>
-              </div>
-              <div class="bg-gray-800 p-5 rounded-lg border border-gray-700 flex flex-col">
-                <h3 class="text-lg font-semibold text-white mb-4">Projetos por Dia (Mês Atual)</h3>
-                <div class="flex-grow relative h-64"> <canvas id="line-chart"></canvas>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+
+                    <div class="glass-card rounded-2xl p-6 relative overflow-hidden group">
+                        <div class="relative z-10">
+                            <p class="text-sm text-gray-400 font-medium uppercase tracking-wide">Projetos Criados</p>
+                            <div class="flex items-baseline gap-2 mt-2">
+                                <h3 id="total-projects" class="text-4xl font-bold text-white">0</h3>
+                                <span class="text-xs text-green-400 font-bold bg-green-900/30 px-2 py-0.5 rounded-full">+ Ativos</span>
+                            </div>
+                        </div>
+                        <div class="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-blue-600 to-blue-400"></div>
+                        <i class='bx bx-folder-open card-icon-bg text-blue-500'></i>
+                    </div>
+
+                    <div class="glass-card rounded-2xl p-6 relative overflow-hidden group">
+                        <div class="relative z-10">
+                            <p class="text-sm text-gray-400 font-medium uppercase tracking-wide">Potência Instalada</p>
+                            <div class="flex items-baseline gap-2 mt-2">
+                                <h3 id="total-power" class="text-4xl font-bold text-amber-400">0</h3>
+                                <span class="text-lg text-gray-500">kWp</span>
+                            </div>
+                        </div>
+                        <div class="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-amber-600 to-amber-400"></div>
+                        <i class='bx bx-bolt-circle card-icon-bg text-amber-500'></i>
+                    </div>
+
+                    <div class="glass-card rounded-2xl p-6 relative overflow-hidden group">
+                        <div class="relative z-10">
+                            <p class="text-sm text-gray-400 font-medium uppercase tracking-wide">Média por Projeto</p>
+                            <div class="flex items-baseline gap-2 mt-2">
+                                <h3 id="average-power" class="text-4xl font-bold text-purple-400">0</h3>
+                                <span class="text-lg text-gray-500">kWp</span>
+                            </div>
+                        </div>
+                        <div class="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-purple-600 to-purple-400"></div>
+                        <i class='bx bx-bar-chart-alt-2 card-icon-bg text-purple-500'></i>
+                    </div>
                 </div>
-              </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+                    <div class="lg:col-span-2 space-y-8">
+                        <div class="glass-card rounded-2xl p-6 border border-gray-700/50">
+                            <div class="flex justify-between items-center mb-6">
+                                <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                                    <i class='bx bx-calendar text-amber-500'></i> Volume Mensal
+                                </h3>
+                                <select class="bg-gray-800 text-xs text-gray-400 border border-gray-700 rounded px-2 py-1 outline-none">
+                                    <option>Este Mês</option>
+                                </select>
+                            </div>
+                            <div class="h-72 w-full relative">
+                                <canvas id="line-chart"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="glass-card rounded-2xl p-6 border border-gray-700/50 flex flex-col sm:flex-row gap-6 items-center">
+                            <div class="w-full sm:w-1/2">
+                                <h3 class="text-lg font-bold text-white mb-2 flex items-center gap-2">
+                                    <i class='bx bx-pie-chart-alt-2 text-blue-500'></i> Distribuição
+                                </h3>
+                                <p class="text-sm text-gray-400 mb-4">Análise do porte dos sistemas fotovoltaicos dimensionados.</p>
+                                <div class="space-y-2 text-sm text-gray-300">
+                                    <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-amber-500"></span> Pequeno (< 5kWp)</div>
+                                    <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-blue-500"></span> Médio (5-15kWp)</div>
+                                    <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-red-500"></span> Grande (> 15kWp)</div>
+                                </div>
+                            </div>
+                            <div class="w-full sm:w-1/2 h-48 relative flex justify-center">
+                                <canvas id="doughnut-chart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="lg:col-span-1 space-y-6">
+
+                        <div class="bg-gradient-to-br from-amber-600 to-amber-700 rounded-2xl p-6 shadow-lg text-center relative overflow-hidden">
+                            <div class="relative z-10">
+                                <h3 class="text-xl font-bold text-white mb-2">Novo Dimensionamento</h3>
+                                <p class="text-amber-100 text-sm mb-4">Comece um novo projeto do zero agora mesmo.</p>
+                                <button id="quick-new-project" class="bg-white text-amber-700 font-bold py-2 px-6 rounded-full shadow hover:bg-gray-100 transition w-full">
+                                    <i class='bx bx-plus'></i> Iniciar
+                                </button>
+                            </div>
+                            <i class='bx bx-sun absolute -right-6 -bottom-6 text-9xl text-amber-500 opacity-20 rotate-12'></i>
+                        </div>
+
+                        <div class="glass-card rounded-2xl p-5">
+                            <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wide mb-4 flex items-center gap-2">
+                                <i class='bx bx-time-five'></i> Recentes
+                            </h3>
+
+                            <div id="recent-projects-list" class="space-y-3">
+                                <p class="text-gray-500 text-xs text-center py-4">Carregando...</p>
+                            </div>
+
+                            <button onclick="document.querySelector('[data-tab-target=\'#projetos-content\']').click()" class="w-full mt-4 text-xs text-center text-amber-500 hover:text-amber-400 hover:underline cursor-pointer">
+                                Ver todos os projetos
+                            </button>
+                        </div>
+
+                        <div class="bg-gray-800/50 rounded-xl p-4 border border-gray-700/50">
+                            <div class="flex gap-3">
+                                <div class="bg-blue-900/30 p-2 rounded-lg text-blue-400 h-fit">
+                                    <i class='bx bx-bulb text-xl'></i>
+                                </div>
+                                <div>
+                                    <h4 class="text-white font-bold text-sm">Dica Pro</h4>
+                                    <p class="text-xs text-gray-400 mt-1 leading-relaxed">
+                                        Use os "Presets" na calculadora para salvar seus inversores favoritos e ganhar tempo.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
             </div>
-          </div>
+
+            <div id="projetos-content" class="tab-pane hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
+
+                <div class="flex flex-col md:flex-row justify-between items-end mb-8 gap-4">
+                    <div>
+                        <h2 class="text-3xl font-bold text-white flex items-center gap-3">
+                            Meus <span class="text-gradient-amber">Projetos</span>
+                            <span class="text-xs font-normal text-gray-500 bg-gray-800 px-2 py-1 rounded border border-gray-700">Gerenciamento</span>
+                        </h2>
+                        <p class="text-gray-400 mt-1">Acesse, edite ou exclua seus dimensionamentos salvos.</p>
+                    </div>
+                    <button id="new-project-button" class="group relative bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-400 hover:to-green-500 text-white font-bold py-3 px-8 rounded-xl shadow-lg shadow-emerald-500/30 transition-all duration-300 hover:-translate-y-1 hover:shadow-emerald-500/50 overflow-hidden">
+                        <div class="absolute inset-0 w-full h-full bg-white/20 -translate-x-full skew-x-12 group-hover:animate-shine"></div>
+
+                        <div class="relative flex items-center gap-3">
+                            <i class='bx bx-plus-medical text-lg'></i>
+                            <span class="tracking-wide">NOVO PROJETO</span>
+                        </div>
+                    </button>
+                </div>
+
+                <div class="glass-card p-4 rounded-xl mb-6 flex flex-col lg:flex-row gap-4 items-center border border-gray-700/50">
+
+                    <div class="relative flex-grow w-full lg:w-auto">
+                        <i class='bx bx-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-lg'></i>
+                        <input type="text" id="filter-input" placeholder="Buscar por nome do projeto, cliente..."
+                               class="w-full pl-11 pr-4 py-3 rounded-lg bg-gray-800/50 border border-gray-600 text-gray-200 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-all outline-none placeholder-gray-500">
+                    </div>
+
+                    <div class="flex gap-4 w-full lg:w-auto">
+                        <div class="relative w-full lg:w-auto">
+                            <i class='bx bx-calendar absolute left-3 top-1/2 -translate-y-1/2 text-gray-400'></i>
+                            <input type="date" id="filter-date"
+                                   class="w-full lg:w-40 pl-10 pr-3 py-3 rounded-lg bg-gray-800/50 border border-gray-600 text-gray-400 focus:border-amber-500 transition-all outline-none">
+                        </div>
+
+                        <div class="relative w-full lg:w-auto">
+                            <i class='bx bx-sort-alt-2 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400'></i>
+                            <select id="sort-select"
+                                    class="w-full lg:w-48 pl-10 pr-8 py-3 rounded-lg bg-gray-800/50 border border-gray-600 text-gray-200 focus:border-amber-500 transition-all outline-none appearance-none cursor-pointer">
+                                <option value="created_at_desc">Mais Recentes</option>
+                                <option value="created_at_asc">Mais Antigos</option>
+                                <option value="nome_projeto_asc">A-Z</option>
+                            </select>
+                            <i class='bx bx-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none'></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="project-list" class="glass-card rounded-xl overflow-hidden min-h-[300px] border border-gray-700/50">
+                </div>
+
+                <div id="pagination-controls" class="flex justify-between items-center mt-6 px-2">
+                    <button id="prev-page-button" class="flex items-center gap-2 text-gray-400 hover:text-white disabled:opacity-30 disabled:hover:text-gray-400 transition-colors">
+                        <i class='bx bx-left-arrow-alt text-xl'></i> Anterior
+                    </button>
+                    <span id="page-info" class="text-sm font-mono text-amber-500 bg-amber-900/20 px-3 py-1 rounded border border-amber-900/30">Página 1 de 1</span>
+                    <button id="next-page-button" class="flex items-center gap-2 text-gray-400 hover:text-white disabled:opacity-30 disabled:hover:text-gray-400 transition-colors">
+                        Próxima <i class='bx bx-right-arrow-alt text-xl'></i>
+                    </button>
+                </div>
+            </div>
+
+            <div id="novidades-content" class="tab-pane hidden">
+                <div class="mb-8">
+                    <h1 class="text-3xl font-bold text-white">Novidades e Atualizações</h1>
+                    <p class="text-gray-400 mt-2">Acompanhe a evolução da Calculadora Solar e veja o que mudou.</p>
+                </div>
+
+                <div class="bg-gray-800 p-8 rounded-xl border border-gray-700 max-w-4xl">
+                    <div class="flex items-center justify-between mb-8 border-b border-gray-700 pb-4">
+                        <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                            <i class='bx bxs-rocket text-amber-400'></i> Histórico de Versões
+                        </h2>
+                        <span id="version-display-tab" class="bg-gray-900 text-gray-400 px-3 py-1 rounded text-sm font-mono border border-gray-700">v0.0</span>
+                    </div>
+
+                    <div id="full-news-feed" class="space-y-8 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-gray-600 before:to-transparent">
+                    </div>
+                </div>
+            </div>
+
+        </div> </div>
+</main>
+
+<dialog id="project-modal" class="bg-gray-800 text-white p-8 rounded-xl border border-gray-700 shadow-2xl backdrop:bg-black/70 backdrop:backdrop-blur-sm w-full max-w-lg"></dialog>
+
+<dialog id="news-modal" class="bg-transparent p-0 backdrop:bg-black/80">
+    <div class="bg-gray-800 border border-gray-600 text-white rounded-xl shadow-2xl max-w-md w-full p-6 m-4 relative animate-in fade-in zoom-in duration-300">
+        <div class="text-center mb-6">
+            <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-amber-500/20 text-amber-400 mb-3">
+                <i class='bx bxs-rocket text-2xl'></i>
+            </div>
+            <h2 class="text-xl font-bold">Novidades da Atualização!</h2>
+            <p class="text-gray-400 text-sm mt-1">Confira o que melhoramos para você.</p>
         </div>
-
-        <div id="projetos-content" class="tab-pane hidden">
-          <div class="flex flex-wrap justify-between items-center gap-4 mb-6">
-            <div>
-              <h1 class="text-3xl font-bold text-white">Meus Projetos</h1>
-              <p class="text-gray-400 mt-2">Crie, gerencie e volte a editar os seus projetos salvos a qualquer momento.
-              </p>
-            </div>
-            <button id="new-project-button" class="cta-button green flex items-center">
-              <i class='bx bx-plus-circle mr-2'></i>
-              Criar Novo Projeto
-            </button>
-          </div>
-
-          <div class="flex flex-col sm:flex-row gap-4 mb-6 p-4 bg-gray-800/50 rounded-lg border border-gray-700">
-            <div class="relative flex-grow">
-              <i class='bx bx-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400'></i>
-              <input type="text" id="filter-input" placeholder="Filtrar por nome do projeto ou cliente..."
-                class="w-full p-2 pl-10 rounded bg-gray-700 border border-gray-600 focus:border-amber-500 focus:ring-amber-500 transition-colors">
-            </div>
-
-            <div class="flex items-center gap-2 flex-shrink-0">
-              <label for="filter-date" class="text-gray-400 text-sm">Data:</label>
-              <input type="date" id="filter-date"
-                class="p-2 rounded bg-gray-700 border border-gray-600 focus:border-amber-500 focus:ring-amber-500 transition-colors text-gray-400">
-            </div>
-
-            <div class="flex items-center gap-2 flex-shrink-0">
-              <label for="sort-select" class="text-gray-400 text-sm">Ordenar por:</label>
-              <select id="sort-select"
-                class="p-2 rounded bg-gray-700 border border-gray-600 focus:border-amber-500 focus:ring-amber-500 transition-colors">
-                <option value="created_at_desc">Mais Recentes (Criação)</option>
-                <option value="created_at_asc">Mais Antigos (Criação)</option>
-                <option value="updated_at_desc">Última Modificação</option>
-                <option value="nome_projeto_asc">Nome do Projeto (A-Z)</option>
-              </select>
-            </div>
-          </div>
-          <div id="project-list" class="bg-gray-800 rounded-lg border border-gray-700 min-h-[200px]">
-          </div>
-          <div id="pagination-controls" class="flex justify-between items-center mt-6">
-            <button id="prev-page-button"
-              class="cta-button outline-amber disabled:opacity-50 disabled:cursor-not-allowed">
-              <i class='bx bx-chevron-left mr-2'></i> Anterior
-            </button>
-            <span id="page-info" class="text-gray-400 font-semibold">Página 1 de 1</span>
-            <button id="next-page-button"
-              class="cta-button outline-amber disabled:opacity-50 disabled:cursor-not-allowed">
-              Próximo <i class='bx bx-chevron-right ml-2'></i>
-            </button>
-          </div>
-        </div>
-      </div>
-
+        <div id="modal-news-list" class="space-y-3 max-h-[60vh] overflow-y-auto pr-1 mb-6 custom-scrollbar"></div>
+        <button onclick="closeNewsPopup()" class="w-full cta-button amber py-3 font-bold shadow-lg shadow-amber-500/20">
+            Entendi, marcar como lido
+        </button>
     </div>
-  </main>
+</dialog>
 
-  <dialog id="project-modal"
-    class="bg-gray-800 text-white p-8 rounded-xl border border-gray-700 shadow-2xl backdrop:bg-black/70 backdrop:backdrop-blur-sm w-full max-w-lg">
-  </dialog>
-
-  <script src="dashboard-script.js" defer></script>
+<script src="dashboard-script.js" defer></script>
 </body>
-
 </html>

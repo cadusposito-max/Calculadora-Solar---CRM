@@ -1,204 +1,227 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-br" class="scroll-smooth">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora Solar</title>
-    <link rel="icon"
-        href="C:\Users\LENOVO\Desktop\Calculadora - Versão 0.1\Calculadora - Versão 0.2\Calculadora Solar/seu_icone.png"
-        type="image/png">
+    <title>Calculadora Solar | Validação Fotovoltaica Profissional</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="styles.css">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <style>
+        /* Fundo Grid Sutil na Home inteira */
+        body {
+            background-color: #111827;
+            background-image:
+                    linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                    linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 60px 60px;
+        }
+    </style>
 </head>
 
-<body class="bg-gray-900 text-gray-200">
+<body class="text-gray-200 antialiased selection:bg-amber-500 selection:text-white">
 
-    <header class="fixed top-0 left-0 w-full bg-gray-900/80 backdrop-blur-sm z-50 border-b border-gray-800">
-        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
-            <a href="index.html" class="flex items-center text-amber-500">
-                <i class='bx bxs-calculator text-3xl mr-2'></i>
-                <span class="text-2xl font-bold text-white">Calculadora Solar</span>
+<header class="fixed top-0 left-0 w-full bg-gray-900/80 backdrop-blur-md z-50 border-b border-white/10 transition-all duration-300" id="navbar">
+    <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+        <a href="index.html" class="flex items-center gap-2 group">
+            <div class="w-10 h-10 bg-amber-500/20 rounded-lg flex items-center justify-center text-amber-500 group-hover:bg-amber-500 group-hover:text-gray-900 transition-all">
+                <i class='bx bxs-calculator text-2xl'></i>
+            </div>
+            <span class="text-xl font-bold text-white tracking-wide">Calculadora <span class="text-amber-500">Solar</span></span>
+        </a>
+
+        <div class="flex items-center gap-4">
+            <a href="login.html" class="hidden md:flex text-gray-400 hover:text-white text-sm font-medium transition-colors">
+                Já tenho conta
             </a>
-            <div class="flex items-center space-x-4">
-                <a href="login.html" class="cta-button amber text-sm py-2 px-4 flex items-center">
-                    <i class='bx bx-rocket text-lg mr-2'></i>
-                    Cadastrar
-                </a>
-                <a href="login.html" class="cta-button amber text-sm py-2 px-4 flex items-center">
-                    <i class='bx bx-user text-lg mr-2'></i>
-                    Login
-                </a>
-            </div>
-
-            </div>
-        </nav>
-    </header>
-
-    <main>
-        <section class="hero-com-fundo relative text-center py-40 px-6 overflow-hidden">
-            <div class="relative z-10">
-                <h1 class="text-5xl md:text-6xl font-bold text-white mb-4">Sua Ferramenta Definitiva para Projetos
-                    Solares</h1>
-                <p class="text-xl text-gray-300 max-w-3xl mx-auto mb-8">
-                    Teste, valide e dimensione seus projetos fotovoltaicos com precisão profissional.
-                </p>
-                <a href="dashboard.html" class="cta-button amber text-lg">
-                    Iniciar Validação
-                </a>
-            </div>
-        </section>
-
-        <section class="py-20 bg-gray-900">
-            <div class="container mx-auto px-6">
-                <h2 class="text-4xl font-bold text-center text-white mb-12">Funcionalidades Principais</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                    <div class="feature-card bg-gray-800 p-8 rounded-lg border border-gray-700 text-center">
-                        <div class="text-amber-400 mb-4"><i class='bx bxs-rocket text-5xl'></i></div>
-                        <h3 class="text-2xl font-bold text-white mb-3">Agilidade</h3>
-                        <p class="text-gray-400">Calcule sistemas solares complexos em poucos minutos com rapidez e
-                            confiabilidade.</p>
-                    </div>
-                    <div class="feature-card bg-gray-800 p-8 rounded-lg border border-gray-700 text-center">
-                        <div class="text-amber-400 mb-4"><i class='bx bxs-file-pdf text-5xl'></i></div>
-                        <h3 class="text-2xl font-bold text-white mb-3">Relatórios Completos</h3>
-                        <p class="text-gray-400">Gere análises técnicas em PDF com diagramas, gráficos e todos os
-                            parâmetros de CC e CA.</p>
-                    </div>
-                    <div class="feature-card bg-gray-800 p-8 rounded-lg border border-gray-700 text-center">
-                        <div class="text-amber-400 mb-4"><i class='bx bx-target-lock text-5xl'></i></div>
-                        <h3 class="text-2xl font-bold text-white mb-3">Precisão Técnica</h3>
-                        <p class="text-gray-400">Validações confiáveis de tensão, corrente, overload e queda de tensão
-                            para projetos seguros.</p>
-                    </div>
-                    <div class="feature-card bg-gray-800 p-8 rounded-lg border border-gray-700 text-center">
-                        <div class="text-amber-400 mb-4"><i class='bx bxs-cog text-5xl'></i></div>
-                        <h3 class="text-2xl font-bold text-white mb-3">Flexibilidade</h3>
-                        <p class="text-gray-400">Ajuste todos os parâmetros, de múltiplos inversores e strings a tipos
-                            de disjuntores e cabos.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section class="parallax-section">
-            <div class="glass-panel container mx-auto px-6">
-                <h2 class="text-4xl font-bold text-center text-white mb-12">Para Quem é a Ferramenta?</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 text-center text-gray-300">
-                    <div class="p-6"><i class='bx bxs-hard-hat text-6xl text-amber-400'></i>
-                        <h3 class="text-xl font-bold mt-4 mb-2 text-white">Engenheiros Eletricistas</h3>
-                        <p class="text-gray-400">Para garantir que cada detalhe técnico do projeto esteja em
-                            conformidade e otimizado.</p>
-                    </div>
-                    <div class="p-6"><i class='bx bxs-user-pin text-6xl text-amber-400'></i>
-                        <h3 class="text-xl font-bold mt-4 mb-2 text-white">Integradores e Vendedores</h3>
-                        <p class="text-gray-400">Para criar propostas rápidas, precisas e gerar relatórios técnicos para
-                            apresentar aos clientes.</p>
-                    </div>
-                    <div class="p-6"><i class='bx bxs-wrench text-6xl text-amber-400'></i>
-                        <h3 class="text-xl font-bold mt-4 mb-2 text-white">Técnicos e Instaladores</h3>
-                        <p class="text-gray-400">Para validar em campo as configurações de arranjos, cabos e disjuntores
-                            de forma rápida.</p>
-                    </div>
-                    <div class="p-6"><i class='bx bxs-graduation text-6xl text-amber-400'></i>
-                        <h3 class="text-xl font-bold mt-4 mb-2 text-white">Estudantes e Entusiastas</h3>
-                        <p class="text-gray-400">Para aprender e simular projetos fotovoltaicos com uma ferramenta
-                            poderosa e intuitiva.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section class="py-20 bg-gray-900">
-            <div class="container mx-auto px-6 text-center">
-                <h2 class="text-4xl font-bold text-white mb-4">Veja a Calculadora em Ação</h2>
-                <p class="text-lg text-gray-400 max-w-2xl mx-auto mb-8">Descubra em poucos minutos como validar um
-                    projeto completo, desde os módulos até a conexão com a rede.</p>
-                <div class="mx-auto max-w-8x1 video-responsive shadow-lg">
-                    <iframe src="https://www.youtube.com/embed/1JKLM45aIik" frameborder="0"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowfullscreen></iframe>
-                </div>
-            </div>
-        </section>
-
-        <section class="py-20 bg-gray-900">
-            <div class="container mx-auto px-6">
-                <h2 class="text-4xl font-bold text-center text-white mb-12">O que os Profissionais Dizem</h2>
-                <div class="feedback-container">
-                    <div class="feedback-scroller">
-                        <div class="feedback-card">
-                            <div class="stars text-amber-400 text-xl mb-4"><i class='bx bxs-star'></i><i
-                                    class='bx bxs-star'></i><i class='bx bxs-star'></i><i class='bx bxs-star'></i><i
-                                    class='bx bxs-star'></i></div>
-                            <p class="text-gray-300 italic mb-4">"Essa calculadora economizou horas no meu processo de
-                                dimensionamento. A validação de múltiplos cenários é fantástica!"</p>
-                            <footer class="font-bold text-white">- João Silva, Engenheiro Eletricista</footer>
-                        </div>
-                        <div class="feedback-card">
-                            <div class="stars text-amber-400 text-xl mb-4"><i class='bx bxs-star'></i><i
-                                    class='bx bxs-star'></i><i class='bx bxs-star'></i><i class='bx bxs-star'></i><i
-                                    class='bx bxs-star-half'></i></div>
-                            <p class="text-gray-300 italic mb-4">"Finalmente uma ferramenta que entende as nuances do
-                                mercado brasileiro, com opções de disjuntores e cabos que realmente usamos."</p>
-                            <footer class="font-bold text-white">- Maria Oliveira, Integrador Solar</footer>
-                        </div>
-                        <div class="feedback-card">
-                            <div class="stars text-amber-400 text-xl mb-4"><i class='bx bxs-star'></i><i
-                                    class='bx bxs-star'></i><i class='bx bxs-star'></i><i class='bx bxs-star'></i><i
-                                    class='bx bxs-star'></i></div>
-                            <p class="text-gray-300 italic mb-4">"O diagrama SVG e o relatório em PDF são um diferencial
-                                enorme para apresentar propostas técnicas aos meus clientes."</p>
-                            <footer class="font-bold text-white">- Carlos Pereira, Vendedor Técnico</footer>
-                        </div>
-                        <div class="feedback-card">
-                            <div class="stars text-amber-400 text-xl mb-4"><i class='bx bxs-star'></i><i
-                                    class='bx bxs-star'></i><i class='bx bxs-star'></i><i class='bx bxs-star'></i><i
-                                    class='bx bxs-star'></i></div>
-                            <p class="text-gray-300 italic mb-4">"Indispensável para validar rapidamente os arranjos em
-                                campo. A análise de queda de tensão é a cereja do bolo."</p>
-                            <footer class="font-bold text-white">- Ana Costa, Técnica Instaladora</footer>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-
-        <section id="contact" class="py-20 bg-gray-800">
-            <div class="container mx-auto px-6 text-center">
-                <h2 class="text-4xl font-bold text-white mb-4">Pronto para Otimizar Seus Projetos?</h2>
-                <p class="text-lg text-gray-400 mb-8">Chega de planilhas complexas. Comece a usar a ferramenta mais
-                    completa do mercado.</p>
-                <a href="dashboard.html" class="cta-button amber text-sm py-2 px-4 items-center">
-                    <i class='bx bx-rocket text-lg mr-2'></i>
-                    Validar meu Projeto Agora
-                </a>
-            </div>
-        </section>
-    </main>
-
-    <footer class="border-t border-gray-800">
-        <div
-            class="container mx-auto px-6 py-6 flex flex-col sm:flex-row justify-between items-center text-center text-gray-500">
-            <p class="mb-4 sm:mb-0">&copy; 2025 Direitos Reservados</p>
-            <a href="#contact" class="hover:text-amber-400 transition-colors">Contate-nos</a>
+            <a href="login.html" class="bg-white text-gray-900 hover:bg-amber-400 hover:text-gray-900 font-bold text-sm py-2.5 px-5 rounded-full transition-all shadow-lg hover:shadow-amber-500/20 flex items-center gap-2">
+                <i class='bx bx-rocket'></i> Acessar Sistema
+            </a>
         </div>
-    </footer>
+    </nav>
+</header>
 
-    <script>
-        const scrollers = document.querySelectorAll(".feedback-scroller");
-        if (scrollers.length > 0) {
-            const scrollerInner = scrollers[0];
-            const scrollerContent = Array.from(scrollerInner.children);
-            scrollerContent.forEach(item => {
-                const duplicatedItem = item.cloneNode(true);
-                duplicatedItem.setAttribute("aria-hidden", true);
-                scrollerInner.appendChild(duplicatedItem);
-            });
-        }
-    </script>
+<main>
+    <section class="relative pt-40 pb-20 px-6 overflow-hidden">
+        <div class="absolute top-20 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-amber-500/20 rounded-full blur-[120px] -z-10"></div>
+
+        <div class="container mx-auto text-center relative z-10 max-w-4xl">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-bold uppercase tracking-wider mb-6">
+                <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span> Versão 1.3 Disponível
+            </div>
+
+            <h1 class="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">
+                Valide seus Projetos Solares com <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-500">Precisão Absoluta.</span>
+            </h1>
+
+            <p class="text-xl text-gray-400 mb-10 max-w-2xl mx-auto leading-relaxed">
+                Deixe as planilhas complexas para trás. Dimensione inversores, cabos e proteções em segundos com nossa ferramenta inteligente.
+            </p>
+
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="login.html" class="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-white text-lg font-bold py-4 px-8 rounded-xl shadow-xl shadow-amber-500/20 transform transition hover:-translate-y-1 flex items-center justify-center gap-2">
+                    Começar Agora Grátis <i class='bx bx-right-arrow-alt'></i>
+                </a>
+                <a href="#como-funciona" class="bg-gray-800 hover:bg-gray-700 text-white text-lg font-bold py-4 px-8 rounded-xl border border-gray-700 transform transition hover:-translate-y-1 flex items-center justify-center gap-2">
+                    <i class='bx bx-cog text-2xl text-gray-400'></i> Como Funciona
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-20 relative">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">Por que usar nossa calculadora?</h2>
+                <p class="text-gray-400">Tudo o que você precisa para entregar projetos tecnicamente perfeitos.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="glass-card p-8 rounded-2xl relative group overflow-hidden">
+                    <div class="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center text-blue-400 mb-4 group-hover:bg-blue-500 group-hover:text-white transition-colors">
+                        <i class='bx bxs-zap text-2xl'></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-2">Cálculo Instantâneo</h3>
+                    <p class="text-gray-400 text-sm">Validação de tensão, corrente e potência em tempo real enquanto você digita.</p>
+                    <i class='bx bxs-zap card-icon-bg text-blue-500'></i>
+                </div>
+
+                <div class="glass-card p-8 rounded-2xl relative group overflow-hidden">
+                    <div class="w-12 h-12 bg-amber-500/20 rounded-lg flex items-center justify-center text-amber-400 mb-4 group-hover:bg-amber-500 group-hover:text-white transition-colors">
+                        <i class='bx bxs-file-pdf text-2xl'></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-2">PDF Profissional</h3>
+                    <p class="text-gray-400 text-sm">Gere memoriais de cálculo completos e diagramas unifilares com um clique.</p>
+                    <i class='bx bxs-file-pdf card-icon-bg text-amber-500'></i>
+                </div>
+
+                <div class="glass-card p-8 rounded-2xl relative group overflow-hidden">
+                    <div class="w-12 h-12 bg-green-500/20 rounded-lg flex items-center justify-center text-green-400 mb-4 group-hover:bg-green-500 group-hover:text-white transition-colors">
+                        <i class='bx bx-check-shield text-2xl'></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-2">100% Validado</h3>
+                    <p class="text-gray-400 text-sm">Verificações de Overload, Tensão Máxima e Queda de Tensão conforme normas.</p>
+                    <i class='bx bx-check-shield card-icon-bg text-green-500'></i>
+                </div>
+
+                <div class="glass-card p-8 rounded-2xl relative group overflow-hidden">
+                    <div class="w-12 h-12 bg-purple-500/20 rounded-lg flex items-center justify-center text-purple-400 mb-4 group-hover:bg-purple-500 group-hover:text-white transition-colors">
+                        <i class='bx bxs-cloud-upload text-2xl'></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-2">Nuvem Segura</h3>
+                    <p class="text-gray-400 text-sm">Salve seus projetos e equipamentos favoritos e acesse de qualquer lugar.</p>
+                    <i class='bx bxs-cloud-upload card-icon-bg text-purple-500'></i>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="como-funciona" class="py-20 bg-gray-800/30 border-y border-gray-800">
+        <div class="container mx-auto px-6">
+            <div class="flex flex-col lg:flex-row items-center gap-12">
+
+                <div class="lg:w-1/2">
+                    <h2 class="text-3xl md:text-4xl font-bold text-white mb-6">Fluxo de Trabalho Inteligente</h2>
+                    <p class="text-gray-400 mb-8 text-lg leading-relaxed">
+                        Simplificamos a engenharia complexa em três passos intuitivos. Focamos na conformidade técnica para você focar nas vendas.
+                    </p>
+
+                    <div class="space-y-6">
+                        <div class="flex gap-4">
+                            <div class="flex-shrink-0 w-10 h-10 rounded-full bg-amber-500 flex items-center justify-center font-bold text-gray-900">1</div>
+                            <div>
+                                <h4 class="text-white font-bold text-lg">Configuração Rápida</h4>
+                                <p class="text-gray-400 text-sm">Selecione módulos e inversores do nosso banco de dados ou cadastre novos em segundos.</p>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-4">
+                            <div class="flex-shrink-0 w-10 h-10 rounded-full bg-gray-700 border border-gray-600 flex items-center justify-center font-bold text-white">2</div>
+                            <div>
+                                <h4 class="text-white font-bold text-lg">Arranjo Automático</h4>
+                                <p class="text-gray-400 text-sm">O sistema calcula a melhor distribuição de strings nas MPPTs, respeitando limites de tensão e corrente.</p>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-4">
+                            <div class="flex-shrink-0 w-10 h-10 rounded-full bg-gray-700 border border-gray-600 flex items-center justify-center font-bold text-white">3</div>
+                            <div>
+                                <h4 class="text-white font-bold text-lg">Validação de Cabos</h4>
+                                <p class="text-gray-400 text-sm">Verificação de queda de tensão CC e dimensionamento de cabos e disjuntores CA (NBR 5410).</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lg:w-1/2">
+                    <div class="glass-card p-1 rounded-2xl border border-gray-700/50 transform rotate-2 hover:rotate-0 transition-all duration-500">
+                        <div class="bg-gray-900 rounded-xl p-6 border border-gray-800">
+                            <div class="flex items-center justify-between mb-4 border-b border-gray-800 pb-4">
+                                <div class="flex gap-2">
+                                    <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                                    <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+                                    <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                                </div>
+                                <div class="text-xs text-gray-500 font-mono">analysis_report.pdf</div>
+                            </div>
+                            <div class="space-y-3">
+                                <div class="h-4 bg-gray-800 rounded w-3/4"></div>
+                                <div class="h-4 bg-gray-800 rounded w-1/2"></div>
+                                <div class="flex gap-2 mt-4">
+                                    <div class="h-20 bg-amber-500/10 border border-amber-500/20 rounded flex-1 flex flex-col items-center justify-center text-amber-500">
+                                        <i class='bx bxs-bolt text-2xl mb-1'></i>
+                                        <span class="text-xs font-bold">Overload OK</span>
+                                    </div>
+                                    <div class="h-20 bg-green-500/10 border border-green-500/20 rounded flex-1 flex flex-col items-center justify-center text-green-500">
+                                        <i class='bx bxs-check-circle text-2xl mb-1'></i>
+                                        <span class="text-xs font-bold">Tensão OK</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-10 border-b border-gray-800">
+        <div class="container mx-auto px-6 text-center">
+            <p class="text-gray-500 text-sm font-medium uppercase tracking-widest mb-6">Projetado em conformidade com</p>
+            <div class="flex flex-wrap justify-center gap-8 md:gap-16 opacity-50 grayscale hover:grayscale-0 transition-all duration-500">
+                <div class="flex items-center gap-2 text-xl font-bold text-gray-300"><i class='bx bxs-book-bookmark text-amber-500'></i> NBR 5410</div>
+                <div class="flex items-center gap-2 text-xl font-bold text-gray-300"><i class='bx bxs-sun text-amber-500'></i> NBR 16690</div>
+                <div class="flex items-center gap-2 text-xl font-bold text-gray-300"><i class='bx bxs-certification text-amber-500'></i> PRODIST</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-20 bg-gradient-to-b from-transparent to-gray-800/50">
+        <div class="container mx-auto px-6 text-center max-w-3xl">
+            <h2 class="text-4xl font-bold text-white mb-6">Pronto para elevar o nível dos seus projetos?</h2>
+            <p class="text-gray-400 mb-8 text-lg">Junte-se a centenas de engenheiros que já usam a Calculadora Solar diariamente.</p>
+            <a href="login.html" class="inline-flex items-center bg-white text-gray-900 hover:bg-amber-400 font-bold py-4 px-10 rounded-full shadow-lg transition-all transform hover:scale-105">
+                Criar Conta Gratuita <i class='bx bx-right-arrow-alt ml-2 text-xl'></i>
+            </a>
+        </div>
+    </section>
+</main>
+
+<footer class="border-t border-gray-800 bg-gray-900 py-12">
+    <div class="container mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6">
+        <div class="flex items-center gap-2 text-gray-400">
+            <i class='bx bxs-calculator text-amber-500 text-xl'></i>
+            <span class="font-bold text-gray-200">Calculadora Solar Pro</span>
+            <span class="text-sm ml-2">&copy; 2025</span>
+        </div>
+        <div class="flex gap-6 text-sm text-gray-500">
+            <a href="#" class="hover:text-amber-400 transition-colors">Termos de Uso</a>
+            <a href="#" class="hover:text-amber-400 transition-colors">Privacidade</a>
+            <a href="#" class="hover:text-amber-400 transition-colors">Suporte</a>
+        </div>
+    </div>
+</footer>
+
 </body>
-
 </html>

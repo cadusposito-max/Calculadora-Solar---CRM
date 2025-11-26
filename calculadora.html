@@ -14,215 +14,278 @@
         <link rel="stylesheet" href="styles.css">
 </head>
 
-<body class="bg-gray-900 text-gray-200 p-4 relative">
+<body class="bg-gray-900 text-gray-200 p-4 relative antialiased">
 
-        <div class="bg-gray-800 p-6 sm:p-8 rounded-xl shadow-2xl border border-gray-700 max-w-5xl w-full mx-auto my-12">
-                <div class="flex justify-between items-center mb-6">
-                        <a href="dashboard.html" class="flex items-center text-amber-400">
-                                <i class='bx bxs-calculator text-2xl mr-2'></i>
-                                <span class="text-1xl font-bold text-white">Calculadora Solar</span>
-                        </a>
-                        <a href="projeto-detalhes.html" class="text-gray-400 hover:text-amber-400 transition-colors">&larr;
-                                Voltar para
-                                o Cliente</a>
+<div class="max-w-7xl mx-auto my-6">
+    <div class="flex flex-col md:flex-row justify-between items-center mb-6 bg-gray-800 p-4 rounded-xl border border-gray-700 shadow-lg">
+        <div class="flex items-center gap-4">
+                <div>
+                    <h1 class="text-xl font-bold text-white leading-none">Calculadora Solar</h1>
+                    <span class="text-xs text-gray-400">Validação Técnica Profissional</span>
+                </div>
+            </a>
+        </div>
+        <div class="mt-4 md:mt-0 flex gap-3">
+            <a id="back-link" href="dashboard.html" class="text-sm text-gray-400 hover:text-white transition flex items-center border border-gray-600 px-3 py-2 rounded-lg hover:bg-gray-700">
+                <i class='bx bx-arrow-back mr-1'></i> Voltar
+            </a>
+            </a>
+        </div>
+    </div>
+
+    <form id="solar-form">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+
+            <div class="space-y-6">
+                <div class="bg-gray-800 p-5 rounded-xl border border-gray-700 shadow-lg relative overflow-hidden group">
+                    <div class="absolute top-0 left-0 w-1 h-full bg-blue-500"></div>
+                    <h3 class="text-base font-bold text-white mb-4 flex items-center gap-2">
+                        <i class='bx bx-sun text-blue-400'></i> Dados do Sistema
+                    </h3>
+
+                    <div class="space-y-3">
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="label-compact">Inversores</label>
+                                <input type="number" id="inverterCount" value="1" class="input-compact">
+                            </div>
+                            <div>
+                                <label class="label-compact">Total Módulos</label>
+                                <input type="number" id="moduleCount" placeholder="Ex: 68" class="input-compact">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="label-compact">Irradiação</label>
+                                <div class="relative">
+                                    <input type="number" id="irradiation" value="5.4" step="0.1" class="input-compact pr-8">
+                                    <span class="absolute right-2 top-1.5 text-xs text-gray-500">kWh</span>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="label-compact">Perdas (%)</label>
+                                <input type="number" id="systemLosses" value="20" class="input-compact">
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <h1 class="text-3xl font-bold text-white text-center mb-8">
-                        Validação Técnica de Sistema Fotovoltaico
-                </h1>
+                <div class="bg-gray-800 p-5 rounded-xl border border-gray-700 shadow-lg relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-1 h-full bg-purple-500"></div>
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="text-base font-bold text-white flex items-center gap-2">
+                            <i class='bx bx-trending-down text-purple-400'></i> Queda de Tensão
+                        </h3>
+                        <input id="enableVdropCalc" type="checkbox" class="accent-purple-500 w-4 h-4">
+                    </div>
 
-                <form id="solar-form">
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
-                                <div class="flex flex-col space-y-4">
-                                        <h3 class="text-lg font-semibold text-white border-b-2 border-white pb-2 mb-2">
-                                                Dados do Sistema</h3>
-                                        <div><label for="inverterCount"
-                                                        class="block mb-2 text-sm font-medium text-gray-400">Quantidade
-                                                        de
-                                                        Inversores</label><input type="number" id="inverterCount"
-                                                        value="1" required
-                                                        class="bg-gray-700 border border-gray-600 text-gray-100 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5">
-                                        </div>
-                                        <div><label for="moduleCount"
-                                                        class="block mb-2 text-sm font-medium text-gray-400">Quantidade
-                                                        Total
-                                                        de Módulos</label><input type="number" id="moduleCount"
-                                                        placeholder="Ex: 21" required
-                                                        class="bg-gray-700 border border-gray-600 text-gray-100 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5">
-                                        </div>
-                                        <div><label for="irradiation"
-                                                        class="block mb-2 text-sm font-medium text-gray-400">Irradiação
-                                                        Solar
-                                                        (kWh/m²/dia)</label><input type="number" id="irradiation"
-                                                        value="5.4" step="0.1" required
-                                                        class="bg-gray-700 border border-gray-600 text-gray-100 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5">
-                                        </div>
-                                        <div><label for="systemLosses"
-                                                        class="block mb-2 text-sm font-medium text-gray-400">Perdas
-                                                        Totais do
-                                                        Sistema (%)</label><input type="number" id="systemLosses"
-                                                        value="15" required
-                                                        class="bg-gray-700 border border-gray-600 text-gray-100 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5">
-                                        </div>
-                                </div>
-                                <div class="flex flex-col space-y-4">
-                                        <h3 class="text-lg font-semibold text-white border-b-2 border-white pb-2 mb-2">
-                                                Inversor e Rede
-                                                Elétrica</h3>
-                                        <div><label for="gridType"
-                                                        class="block mb-2 text-sm font-medium text-gray-400">Tipo de
-                                                        Rede
-                                                        Elétrica (CA)</label><select id="gridType"
-                                                        class="bg-gray-700 border border-gray-600 text-gray-100 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5">
-                                                        <option value="220_bifasico">220V Bifásico (F+F+N)</option>
-                                                        <option value="380_trifasico">380V Trifásico (3F+N)</option>
-                                                        <option value="220_trifasico">220V Trifásico (3F+N)</option>
-                                                        <option value="127_monofasico">127V Monofásico (F+N)</option>
-                                                </select></div>
-                                        <div><label for="inverterPower"
-                                                        class="block mb-2 text-sm font-medium text-gray-400">Potência do
-                                                        Inversor (W)</label><input type="number" id="inverterPower"
-                                                        placeholder="Ex: 8000" required
-                                                        class="bg-gray-700 border border-gray-600 text-gray-100 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5">
-                                        </div>
-                                        <div><label for="overload"
-                                                        class="block mb-2 text-sm font-medium text-gray-400">Overload CC
-                                                        Máximo
-                                                        Permitido (%)</label><input type="number" id="overload"
-                                                        value="50" required
-                                                        class="bg-gray-700 border border-gray-600 text-gray-100 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5">
-                                        </div>
-                                        <div><label for="mpptCount"
-                                                        class="block mb-2 text-sm font-medium text-gray-400">Nº de
-                                                        MPPTs</label><input type="number" id="mpptCount" value="2"
-                                                        required
-                                                        class="bg-gray-700 border border-gray-600 text-gray-100 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5">
-                                        </div>
-                                        <div><label for="stringsPerMppt"
-                                                        class="block mb-2 text-sm font-medium text-gray-400">Strings por
-                                                        MPPT</label><input type="number" id="stringsPerMppt" value="1"
-                                                        required
-                                                        class="bg-gray-700 border border-gray-600 text-gray-100 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5">
-                                        </div>
-                                        <div><label for="mpptMinV"
-                                                        class="block mb-2 text-sm font-medium text-gray-400">Tensão Mín.
-                                                        MPPT
-                                                        (V)</label><input type="number" id="mpptMinV"
-                                                        placeholder="Ex: 140" required
-                                                        class="bg-gray-700 border border-gray-600 text-gray-100 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5">
-                                        </div>
-                                        <div><label for="inverterMaxV"
-                                                        class="block mb-2 text-sm font-medium text-gray-400">Tensão Máx.
-                                                        Entrada (V)</label><input type="number" id="inverterMaxV"
-                                                        placeholder="Ex: 1000" required
-                                                        class="bg-gray-700 border border-gray-600 text-gray-100 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5">
-                                        </div>
-                                        <div><label for="mpptMaxA"
-                                                        class="block mb-2 text-sm font-medium text-gray-400">Corrente
-                                                        Máx. por
-                                                        MPPT (A)</label><input type="number" id="mpptMaxA"
-                                                        placeholder="Ex: 15" step="0.1" required
-                                                        class="bg-gray-700 border border-gray-600 text-gray-100 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5">
-                                        </div>
-                                </div>
-                                <div class="flex flex-col space-y-4">
-                                        <h3 class="text-lg font-semibold text-white border-b-2 border-white pb-2 mb-2">
-                                                Módulo Fotovoltaico
-                                        </h3>
-                                        <div><label for="modulePower"
-                                                        class="block mb-2 text-sm font-medium text-gray-400">Potência
-                                                        (Wp)</label><input type="number" id="modulePower"
-                                                        placeholder="Ex: 550" required
-                                                        class="bg-gray-700 border border-gray-600 text-gray-100 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5">
-                                        </div>
-                                        <div><label for="moduleVmp"
-                                                        class="block mb-2 text-sm font-medium text-gray-400">Tensão
-                                                        (Vmp)</label><input type="number" id="moduleVmp"
-                                                        placeholder="Ex: 41.8" step="0.01" required
-                                                        class="bg-gray-700 border border-gray-600 text-gray-100 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5">
-                                        </div>
-                                        <div><label for="moduleImp"
-                                                        class="block mb-2 text-sm font-medium text-gray-400">Corrente
-                                                        (Imp)</label><input type="number" id="moduleImp"
-                                                        placeholder="Ex: 13.16" step="0.01" required
-                                                        class="bg-gray-700 border border-gray-600 text-gray-100 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5">
-                                        </div>
-                                        <div><label for="moduleVoc"
-                                                        class="block mb-2 text-sm font-medium text-gray-400">Tensão
-                                                        Circuito
-                                                        Aberto (Voc)</label><input type="number" id="moduleVoc"
-                                                        placeholder="Ex: 49.9" step="0.01" required
-                                                        class="bg-gray-700 border border-gray-600 text-gray-100 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5">
-                                        </div>
-                                        <div><label for="moduleIsc"
-                                                        class="block mb-2 text-sm font-medium text-gray-400">Corrente
-                                                        Curto-Circuito (Isc)</label><input type="number" id="moduleIsc"
-                                                        placeholder="Ex: 13.9" step="0.01" required
-                                                        class="bg-gray-700 border border-gray-600 text-gray-100 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5">
-                                        </div>
-                                        <div><label for="tempCoef"
-                                                        class="block mb-2 text-sm font-medium text-gray-400">Coef. Temp.
-                                                        Voc
-                                                        (%/°C)</label><input type="number" id="tempCoef" value="-0.27"
-                                                        step="0.01" required
-                                                        class="bg-gray-700 border border-gray-600 text-gray-100 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5">
-                                        </div>
-                                        <div><label for="minTemp"
-                                                        class="block mb-2 text-sm font-medium text-gray-400">Temp.
-                                                        Mínima
-                                                        (°C)</label><input type="number" id="minTemp" value="5" required
-                                                        class="bg-gray-700 border border-gray-600 text-gray-100 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5">
-                                        </div>
-                                </div>
+                    <div id="vdrop-inputs" class="hidden space-y-3 pt-2 border-t border-gray-700">
+                        <div>
+                            <label class="label-compact">Distância (m)</label>
+                            <input type="number" id="cableDistance" placeholder="Ex: 20" class="input-compact">
                         </div>
-                        <div class="bg-gray-900/50 p-4 rounded-lg mb-8">
-                                <div class="flex items-center">
-                                        <input id="enableVdropCalc" type="checkbox"
-                                                class="h-4 w-4 rounded border-gray-300 text-sky-600 focus:ring-sky-500">
-                                        <label for="enableVdropCalc"
-                                                class="ml-3 block text-sm font-medium text-gray-200">Calcular Queda de
-                                                Tensão nos Cabos CC (Opcional)</label>
-                                </div>
-                                <div id="vdrop-inputs" class="hidden grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
-                                        <div><label for="cableDistance"
-                                                        class="block mb-2 text-sm font-medium text-gray-400">Distância
-                                                        do
-                                                        Arranjo ao Inversor (m)</label><input type="number"
-                                                        id="cableDistance" placeholder="Ex: 20"
-                                                        class="bg-gray-700 border border-gray-600 text-gray-100 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5">
-                                        </div>
-                                        <div><label for="dcCableSize"
-                                                        class="block mb-2 text-sm font-medium text-gray-400">Bitola do
-                                                        Cabo CC
-                                                        a Testar</label><select id="dcCableSize"
-                                                        class="bg-gray-700 border border-gray-600 text-gray-100 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5">
-                                                        <option value="4">4 mm²</option>
-                                                        <option value="6" selected>6 mm²</option>
-                                                        <option value="10">10 mm²</option>
-                                                        <option value="16">16 mm²</option>
-                                                        <option value="25">25 mm²</option>
-                                                </select></div>
-                                </div>
+                        <div>
+                            <label class="label-compact">Bitola Teste</label>
+                            <select id="dcCableSize" class="input-compact">
+                                <option value="4">4 mm²</option>
+                                <option value="6" selected>6 mm²</option>
+                                <option value="10">10 mm²</option>
+                                <option value="16">16 mm²</option>
+                            </select>
                         </div>
-                        <div class="flex flex-col sm:flex-row gap-4">
-                                <button type="button" id="calculate-button" class="w-full cta-button green">
-                                        <i class='bx bx-check-shield text-xl mr-2'></i>Validar Configuração
-                                </button>
-                                <button type="button" id="save-button" class="w-full cta-button amber hidden">
-                                        <i class='bx bx-save text-xl mr-2'></i>Salvar Projeto
-                                </button>
-                                <button type="button" id="clear-button"
-                                        class="w-full sm:w-auto cta-button outline-amber">
-                                        <i class='bx bx-trash text-xl mr-2'></i>Limpar Campos
-                                </button>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-2 italic" id="vdrop-hint">Habilite para calcular perdas nos cabos CC.</p>
+                </div>
+            </div>
+
+            <div class="bg-gray-800 p-5 rounded-xl border border-gray-700 shadow-lg relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-1 h-full bg-amber-500"></div>
+
+                <div class="flex flex-col gap-2 mb-4">
+                    <h3 class="text-base font-bold text-white flex items-center gap-2">
+                        <i class='bx bx-server text-amber-400'></i> Inversor e Rede
+                    </h3>
+                    <div class="flex gap-1">
+                        <div class="combobox-container flex-grow">
+                            <input type="text" id="searchInverter" placeholder="Buscar inversor salvo..."
+                                   class="bg-gray-900 border border-gray-600 text-gray-300 text-xs rounded-l px-2 py-1.5 w-full focus:outline-none focus:border-amber-500" autocomplete="off">
+                            <input type="hidden" id="savedInvertersId">
+                            <div id="listInverter" class="combobox-list custom-scrollbar"></div>
                         </div>
 
-                        <div id="results"
-                                class="hidden mt-8 p-6 bg-gray-700/50 border-l-4 border-amber-500 rounded-r-lg space-y-4">
+                        <button onclick="saveEquipment('inverter')" type="button" class="bg-gray-700 hover:bg-amber-600 text-white px-2 rounded-none border-y border-r border-gray-600 transition"><i class='bx bxs-save'></i></button>
+                        <button onclick="deleteEquipment('inverter')" type="button" class="bg-gray-700 hover:bg-red-600 text-white px-2 rounded-r border-y border-r border-gray-600 transition"><i class='bx bx-trash'></i></button>
+                    </div>
+                </div>
+
+                <div class="space-y-3">
+                    <div class="grid grid-cols-2 gap-2">
+                        <input type="text" id="invBrand" placeholder="Marca" class="input-compact bg-gray-900/50">
+                        <input type="text" id="invModel" placeholder="Modelo" class="input-compact bg-gray-900/50">
+                    </div>
+
+                    <div>
+                        <label class="label-compact">Tipo de Rede</label>
+                        <select id="gridType" class="input-compact">
+                            <option value="220_trifasico">220V Trifásico (3F+N)</option>
+                            <option value="380_trifasico">380V Trifásico (3F+N)</option>
+                            <option value="220_bifasico">220V Bifásico (F+F+N)</option>
+                            <option value="127_monofasico">127V Monofásico (F+N)</option>
+                        </select>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="label-compact">Potência (W)</label>
+                            <input type="number" id="inverterPower" placeholder="30000" class="input-compact">
                         </div>
+                        <div>
+                            <label class="label-compact">Overload (%)</label>
+                            <input type="number" id="overload" value="50" class="input-compact">
+                        </div>
+                    </div>
+
+                    <div class="bg-gray-900/30 p-3 rounded-lg border border-gray-700/50">
+                        <p class="text-[10px] text-gray-400 uppercase font-bold mb-2 tracking-wider">Configuração MPPT</p>
+
+                        <div class="grid grid-cols-2 gap-3 mb-3">
+                            <div>
+                                <label class="label-compact">Qtd MPPTs</label>
+                                <input type="number" id="mpptCount" value="4" class="input-compact">
+                            </div>
+                            <div>
+                                <label class="label-compact">Entradas/MPPT</label>
+                                <input type="text" id="connectorsPerMppt" value="2" class="input-compact text-center" title="Ex: 2 ou 3,3,2,2">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="label-compact">V Mín (Start)</label>
+                                <input type="number" id="mpptMinV" placeholder="180" class="input-compact">
+                            </div>
+                            <div>
+                                <label class="label-compact">V Máx (Entrada)</label>
+                                <input type="number" id="inverterMaxV" placeholder="1000" class="input-compact">
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <label class="label-compact">Corrente Máx (A) por MPPT</label>
+                            <input type="number" id="mpptMaxA" placeholder="30" class="input-compact">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="label-compact">Fator Agrupamento (FCA)</label>
+                        <select id="groupingFactor" class="input-compact">
+                            <option value="1.0">1 Circuito</option>
+                            <option value="0.7" selected>3 Circuitos (Padrão)</option>
+                            <option value="0.65">4+ Circuitos</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-gray-800 p-5 rounded-xl border border-gray-700 shadow-lg relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-1 h-full bg-green-500"></div>
+
+                <div class="flex flex-col gap-2 mb-4">
+                    <h3 class="text-base font-bold text-white flex items-center gap-2">
+                        <i class='bx bx-grid-alt text-green-400'></i> Módulo FV
+                    </h3>
+                    <div class="flex gap-1">
+                        <div class="combobox-container flex-grow">
+                            <input type="text" id="searchModule" placeholder="Buscar módulo salvo..."
+                                   class="bg-gray-900 border border-gray-600 text-gray-300 text-xs rounded-l px-2 py-1.5 w-full focus:outline-none focus:border-green-500" autocomplete="off">
+                            <input type="hidden" id="savedModulesId">
+                            <div id="listModule" class="combobox-list custom-scrollbar"></div>
+                        </div>
+
+                        <button onclick="saveEquipment('module')" type="button" class="bg-gray-700 hover:bg-green-600 text-white px-2 rounded-none border-y border-r border-gray-600 transition"><i class='bx bxs-save'></i></button>
+                        <button onclick="deleteEquipment('module')" type="button" class="bg-gray-700 hover:bg-red-600 text-white px-2 rounded-r border-y border-r border-gray-600 transition"><i class='bx bx-trash'></i></button>
+                    </div>
+                </div>
+
+                <div class="space-y-3">
+                    <div class="grid grid-cols-2 gap-2">
+                        <input type="text" id="modBrand" placeholder="Marca" class="input-compact bg-gray-900/50">
+                        <input type="text" id="modModel" placeholder="Modelo" class="input-compact bg-gray-900/50">
+                    </div>
+
+                    <div>
+                        <label class="label-compact">Potência (Wp)</label>
+                        <input type="number" id="modulePower" placeholder="585" class="input-compact text-green-400 font-bold">
+                    </div>
+
+                    <div class="bg-gray-900/30 p-3 rounded-lg border border-gray-700/50">
+                        <p class="text-[10px] text-gray-400 uppercase font-bold mb-2 tracking-wider">Dados Elétricos (STC)</p>
+
+                        <div class="grid grid-cols-2 gap-3 mb-3">
+                            <div>
+                                <label class="label-compact text-sky-400">Vmp (V)</label>
+                                <input type="number" id="moduleVmp" placeholder="42.7" step="0.01" class="input-compact">
+                            </div>
+                            <div>
+                                <label class="label-compact text-sky-400">Imp (A)</label>
+                                <input type="number" id="moduleImp" placeholder="13.6" step="0.01" class="input-compact">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="label-compact text-gray-400">Voc (V)</label>
+                                <input type="number" id="moduleVoc" placeholder="51.6" step="0.01" class="input-compact">
+                            </div>
+                            <div>
+                                <label class="label-compact text-gray-400">Isc (A)</label>
+                                <input type="number" id="moduleIsc" placeholder="14.4" step="0.01" class="input-compact">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="label-compact">Coef. Temp (%/°C)</label>
+                            <input type="number" id="tempCoef" value="-0.27" step="0.01" class="input-compact">
+                        </div>
+                        <div>
+                            <label class="label-compact">Temp Mín (°C)</label>
+                            <input type="number" id="minTemp" value="5" class="input-compact">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
 
-        <script src="calculadora.js"></script>
+        <div class="mt-8 flex flex-col sm:flex-row gap-4 p-4 bg-gray-800 rounded-xl border border-gray-700 shadow-xl">
+            <button type="button" id="calculate-button" class="flex-1 bg-gradient-to-r from-green-600 to-green-500 hover:from-green-500 hover:to-green-400 text-white font-bold py-3 px-6 rounded-lg shadow-lg transform transition hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center text-lg">
+                <i class='bx bx-check-shield text-2xl mr-2'></i> Validar
+            </button>
+            <button type="button" id="save-button" class="hidden sm:flex-1 bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-white font-bold py-3 px-6 rounded-lg shadow-lg transform transition hover:scale-[1.01] flex items-center justify-center text-lg">
+                <i class='bx bx-save text-2xl mr-2'></i> Salvar
+            </button>
+            <button type="button" id="clear-button" class="sm:w-auto bg-gray-700 hover:bg-gray-600 text-gray-300 font-bold py-3 px-6 rounded-lg transition flex items-center justify-center">
+                <i class='bx bx-trash text-xl'></i>
+            </button>
+        </div>
+
+    </form>
+
+    <div id="results" class="hidden mt-8 p-6 bg-gray-800 border-t-4 border-amber-500 rounded-xl shadow-2xl animate-fade-in">
+    </div>
+</div>
+
+<div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-2"></div>
+
+<script>
+    document.getElementById('enableVdropCalc').addEventListener('change', function(){
+        document.getElementById('vdrop-inputs').classList.toggle('hidden');
+        document.getElementById('vdrop-hint').classList.toggle('hidden');
+    });
+</script>
+<script src="calculadora.js"></script>
 </body>
 
 </html>
