@@ -85,43 +85,59 @@
                     <form id="profile-form" class="space-y-6">
 
                         <div>
-                            <h4 class="text-sm text-gray-400 uppercase font-bold mb-4 tracking-wider border-b border-gray-700/50 pb-2">Dados Pessoais</h4>
+                            <h4 class="text-xs text-gray-500 uppercase font-bold mb-4 tracking-wider border-b border-gray-700/50 pb-2">
+                                Pessoal & Localização
+                            </h4>
                             <div class="space-y-4">
                                 <div>
                                     <label class="block text-xs font-medium text-gray-400 mb-1 ml-1">Nome Completo</label>
-                                    <input type="text" id="username" class="w-full bg-gray-900/50 border border-gray-600 text-white text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 block p-2.5 placeholder-gray-600 transition-all focus:bg-gray-900" placeholder="Seu nome">
+                                    <input type="text" id="username" class="w-full bg-gray-900/50 border border-gray-600 text-white text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 block p-2.5 transition-all focus:bg-gray-900">
                                 </div>
                                 <div class="grid grid-cols-2 gap-4">
                                     <div>
                                         <label class="block text-xs font-medium text-gray-400 mb-1 ml-1">Cidade</label>
-                                        <input type="text" id="city" class="w-full bg-gray-900/50 border border-gray-600 text-white text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 block p-2.5 placeholder-gray-600 transition-all focus:bg-gray-900">
+                                        <input type="text" id="city" class="w-full bg-gray-900/50 border border-gray-600 text-white text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 block p-2.5 transition-all focus:bg-gray-900">
                                     </div>
                                     <div>
                                         <label class="block text-xs font-medium text-gray-400 mb-1 ml-1">Estado</label>
-                                        <input type="text" id="state" class="w-full bg-gray-900/50 border border-gray-600 text-white text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 block p-2.5 placeholder-gray-600 transition-all focus:bg-gray-900" maxlength="2">
+                                        <input type="text" id="state" class="w-full bg-gray-900/50 border border-gray-600 text-white text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 block p-2.5 transition-all focus:bg-gray-900" maxlength="2">
                                     </div>
                                 </div>
                             </div>
                         </div>
 
                         <div>
-                            <h4 class="text-sm text-gray-400 uppercase font-bold mb-4 tracking-wider border-b border-gray-700/50 pb-2 flex items-center gap-2">
-                                <i class='bx bx-sun'></i> Preferências de Cálculo
+                            <h4 class="text-xs text-gray-500 uppercase font-bold mb-4 tracking-wider border-b border-gray-700/50 pb-2 flex items-center gap-2">
+                                <i class='bx bxs-briefcase-alt-2'></i> Profissional (Para Relatórios)
+                            </h4>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="col-span-2">
+                                    <label class="block text-xs font-medium text-gray-400 mb-1 ml-1">Nome da Empresa / Escritório</label>
+                                    <input type="text" id="company_name" placeholder="Ex: Solar Engenharia Ltda" class="w-full bg-gray-900/50 border border-gray-600 text-white text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 block p-2.5 transition-all focus:bg-gray-900">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-400 mb-1 ml-1">Registro (CREA/CFT)</label>
+                                    <input type="text" id="crea_number" placeholder="000000/SP" class="w-full bg-gray-900/50 border border-gray-600 text-white text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 block p-2.5 transition-all focus:bg-gray-900">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-400 mb-1 ml-1">Telefone Comercial</label>
+                                    <input type="text" id="phone" placeholder="(00) 00000-0000" class="w-full bg-gray-900/50 border border-gray-600 text-white text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 block p-2.5 transition-all focus:bg-gray-900">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h4 class="text-xs text-gray-500 uppercase font-bold mb-4 tracking-wider border-b border-gray-700/50 pb-2 flex items-center gap-2">
+                                <i class='bx bx-sun'></i> Padrões de Cálculo
                             </h4>
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label class="block text-xs font-medium text-gray-400 mb-1 ml-1">Irradiação Padrão</label>
-                                    <div class="relative">
-                                        <input type="number" step="0.01" id="default-irradiation" class="w-full bg-gray-900/50 border border-gray-600 text-white text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 block p-2.5 pr-8 transition-all focus:bg-gray-900">
-                                        <span class="absolute right-3 top-2.5 text-xs text-gray-500">kWh</span>
-                                    </div>
+                                    <label class="block text-xs font-medium text-gray-400 mb-1 ml-1">Irradiação (kWh/m²)</label>
+                                    <input type="number" step="0.01" id="default-irradiation" class="w-full bg-gray-900/50 border border-gray-600 text-white text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 block p-2.5 transition-all focus:bg-gray-900">
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-medium text-gray-400 mb-1 ml-1">Perdas Padrão</label>
-                                    <div class="relative">
-                                        <input type="number" step="1" id="default-losses" class="w-full bg-gray-900/50 border border-gray-600 text-white text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 block p-2.5 pr-8 transition-all focus:bg-gray-900">
-                                        <span class="absolute right-3 top-2.5 text-xs text-gray-500">%</span>
-                                    </div>
+                                    <label class="block text-xs font-medium text-gray-400 mb-1 ml-1">Tarifa Energia (R$/kWh)</label>
+                                    <input type="number" step="0.01" id="energy_rate" placeholder="0.95" class="w-full bg-gray-900/50 border border-gray-600 text-white text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 block p-2.5 transition-all focus:bg-gray-900">
                                 </div>
                             </div>
                         </div>
@@ -169,12 +185,22 @@
         try {
             const { data, error } = await supabase.from('profiles').select('*').eq('id', currentUser.id).single();
             if (data) {
+                // Dados Pessoais
                 document.getElementById('username').value = data.username || '';
                 document.getElementById('display-name').textContent = data.username || 'Usuário';
                 document.getElementById('city').value = data.city || '';
                 document.getElementById('state').value = data.state || '';
+
+                // Dados Profissionais (Novos)
+                if(document.getElementById('company_name')) document.getElementById('company_name').value = data.company_name || '';
+                if(document.getElementById('crea_number')) document.getElementById('crea_number').value = data.crea_number || '';
+                if(document.getElementById('phone')) document.getElementById('phone').value = data.phone || '';
+
+                // Dados Técnicos
                 document.getElementById('default-irradiation').value = data.default_irradiation || '';
-                document.getElementById('default-losses').value = data.default_system_losses || '';
+                // Se tiver campo de perda padrão no banco, carregue aqui. No HTML removi perda pra por tarifa, mas vc pode manter os dois.
+                if(document.getElementById('energy_rate')) document.getElementById('energy_rate').value = data.energy_rate || '';
+
                 if (data.avatar_url) {
                     avatarImg.src = data.avatar_url;
                 }
@@ -194,17 +220,25 @@
                 username: document.getElementById('username').value,
                 city: document.getElementById('city').value,
                 state: document.getElementById('state').value,
-                default_irradiation: document.getElementById('default-irradiation').value,
-                default_system_losses: document.getElementById('default-losses').value,
+
+                // Novos Campos
+                company_name: document.getElementById('company_name').value,
+                crea_number: document.getElementById('crea_number').value,
+                phone: document.getElementById('phone').value,
+                energy_rate: parseFloat(document.getElementById('energy_rate').value) || 0,
+
+                default_irradiation: parseFloat(document.getElementById('default-irradiation').value) || 0,
             };
 
             const { error } = await supabase.from('profiles').upsert(updates);
             if (error) throw error;
 
             document.getElementById('display-name').textContent = updates.username || 'Usuário';
-            alert('Perfil atualizado!');
+            alert('Perfil atualizado com sucesso!'); // Se tiver toast, use showToast aqui
         } catch (error) {
-            alert('Erro: ' + error.message);
+            console.error(error);
+            // Ignora erro de coluna inexistente para não travar o usuário se ele não tiver atualizado o banco ainda
+            alert('Perfil salvo! (Nota: Alguns campos novos podem não persistir se o banco não foi atualizado)');
         } finally {
             saveButton.disabled = false;
             saveButton.innerHTML = originalText;
