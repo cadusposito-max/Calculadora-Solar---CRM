@@ -10,7 +10,7 @@ let lineChart = null;
 
 // --- SISTEMA DE NOVIDADES (CONFIGURAÇÃO) ---
 const NEWS_CONFIG = {
-    currentVersion: '1.4',
+    currentVersion: '1.6',
     items: [
         // --- NOVA NOVIDADE AQUI NO TOPO ---
         {
@@ -314,13 +314,39 @@ async function loadProjects(filterText = '', sortValue = 'created_at_desc', filt
         const dateStr = dateObj.toLocaleDateString('pt-BR');
         const timeStr = dateObj.toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'});
 
+        // --- 1. LÓGICA DE ÍCONES DINÂMICOS (NOVO) ---
+        const status = proj.status_homologacao || 'novo'; // Pega o status do banco
+        let statusConfig = { icon: 'bxs-file-doc', color: 'text-gray-500', bg: 'bg-gray-800', border: 'border-gray-700' };
+
+        // Mapeamento dos ícones e cores
+        switch(status) {
+            case 'protocolado':
+                statusConfig = { icon: 'bx-send', color: 'text-blue-400', bg: 'bg-blue-900/20', border: 'border-blue-500/30' };
+                break;
+            case 'analise':
+                statusConfig = { icon: 'bx-search-alt', color: 'text-amber-400', bg: 'bg-amber-900/20', border: 'border-amber-500/30' };
+                break;
+            case 'parecer':
+                statusConfig = { icon: 'bx-file', color: 'text-orange-400', bg: 'bg-orange-900/20', border: 'border-orange-500/30' };
+                break;
+            case 'vistoria':
+                statusConfig = { icon: 'bx-hard-hat', color: 'text-purple-400', bg: 'bg-purple-900/20', border: 'border-purple-500/30' };
+                break;
+            case 'aprovado':
+                statusConfig = { icon: 'bx-check-circle', color: 'text-green-400', bg: 'bg-green-900/20', border: 'border-green-500/30' };
+                break;
+            default: // Novo ou Desconhecido
+                statusConfig = { icon: 'bxs-edit-alt', color: 'text-gray-400', bg: 'bg-gray-800', border: 'border-gray-700' };
+        }
+
         tableHTML += `
         <tr class="group hover:bg-white/[0.02] transition-colors duration-200">
             <td class="p-6">
                 <div class="flex items-center gap-5">
-                    <div class="w-12 h-12 rounded-xl bg-gray-800 flex items-center justify-center text-amber-500 border border-gray-700 group-hover:border-amber-500/50 group-hover:bg-gray-800/80 transition-all shadow-lg shadow-black/20">
-                        <i class='bx bxs-file-doc text-2xl'></i>
+                    <div class="w-12 h-12 rounded-xl ${statusConfig.bg} flex items-center justify-center ${statusConfig.color} border ${statusConfig.border} group-hover:scale-110 transition-transform shadow-lg shadow-black/20" title="Status: ${status.toUpperCase()}">
+                        <i class='bx ${statusConfig.icon} text-2xl'></i>
                     </div>
+                    
                     <div>
                         <div class="font-bold text-white group-hover:text-amber-400 transition-colors text-lg">${proj.nome_projeto || 'Sem Título'}</div>
                         <div class="text-xs text-gray-500 font-mono mt-0.5 bg-gray-800/50 px-1.5 py-0.5 rounded w-fit">ID: #${proj.id}</div>
@@ -441,6 +467,32 @@ function renderDashboardCharts(projects) {
                 `;
             });
         }
+        // --- 5. MÉTRICAS DE HOMOLOGAÇÃO (NOVO) ---
+        const statusCounts = {
+            analise: 0,
+            parecer: 0,
+            vistoria: 0,
+            aprovado: 0
+        };
+
+        projects.forEach(proj => {
+            // Se a coluna status_homologacao não existir ainda, considera 'novo'
+            const st = proj.status_homologacao || 'novo';
+
+            // Mapeia os status (pode ajustar conforme o que salvar no banco)
+            if (st === 'analise' || st === 'protocolado') statusCounts.analise++;
+            if (st === 'parecer') statusCounts.parecer++;
+            if (st === 'vistoria') statusCounts.vistoria++;
+            if (st === 'aprovado') statusCounts.aprovado++;
+        });
+
+        // Atualiza os elementos HTML se eles existirem
+        if(document.getElementById('status-analise')) {
+            document.getElementById('status-analise').textContent = statusCounts.analise;
+            document.getElementById('status-parecer').textContent = statusCounts.parecer;
+            document.getElementById('status-vistoria').textContent = statusCounts.vistoria;
+            document.getElementById('status-aprovado').textContent = statusCounts.aprovado;
+        }
     }
 
     // --- 4. GRÁFICOS (MANTIVE IGUAL, SÓ AJUSTEI CORES E FONTES) ---
@@ -528,3 +580,66 @@ function renderDashboardCharts(projects) {
         }
     });
 }
+// --- SISTEMA DE NOTIFICAÇÕES ---
+
+function toggleNotifPanel() {
+    const panel = document.getElementById('notif-panel');
+    panel.classList.toggle('hidden');
+    if(!panel.classList.contains('hidden')) {
+        loadNotifications(); // Recarrega ao abrir
+    }
+}
+
+async function loadNotifications() {
+    const { data: { user } } = await supabase.auth.getUser();
+    if(!user) return;
+
+    // Busca as últimas 10
+    const { data: notifs } = await supabase
+        .from('notificacoes')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(10);
+
+    const listEl = document.getElementById('notif-list');
+    const badge = document.getElementById('notif-badge');
+
+    // Verifica se tem alguma não lida para acender a bolinha vermelha
+    const hasUnread = notifs.some(n => !n.lida);
+    if(hasUnread && badge) badge.classList.remove('hidden');
+    else if(badge) badge.classList.add('hidden');
+
+    if(!notifs || notifs.length === 0) {
+        listEl.innerHTML = '<p class="text-center text-xs text-gray-500 py-4">Tudo limpo por aqui.</p>';
+        return;
+    }
+
+    listEl.innerHTML = '';
+    notifs.forEach(n => {
+        const bgClass = n.lida ? 'bg-transparent opacity-60' : 'bg-gray-800/50 border-l-2 border-amber-500';
+        listEl.innerHTML += `
+            <div class="p-3 border-b border-gray-700/50 text-sm hover:bg-gray-700 transition ${bgClass}">
+                <a href="${n.link || '#'}" class="block">
+                    <strong class="text-white block text-xs mb-1">${n.titulo}</strong>
+                    <p class="text-gray-300 text-xs">${n.mensagem}</p>
+                    <span class="text-[10px] text-gray-500 mt-1 block">${new Date(n.created_at).toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'})}</span>
+                </a>
+            </div>
+        `;
+    });
+}
+
+async function markAllRead() {
+    const { data: { user } } = await supabase.auth.getUser();
+    if(!user) return;
+
+    await supabase.from('notificacoes').update({ lida: true }).eq('user_id', user.id);
+    loadNotifications();
+}
+
+// Carregar badge ao iniciar a página
+document.addEventListener('DOMContentLoaded', () => {
+    // ... seus outros inits ...
+    loadNotifications();
+});

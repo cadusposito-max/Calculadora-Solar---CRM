@@ -96,6 +96,46 @@
         <form id="details-form" class="space-y-8">
 
             <div class="glass-card rounded-2xl p-8 border border-gray-700/50 shadow-xl relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-1 h-full bg-emerald-500"></div>
+
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                        <i class='bx bx-git-branch text-emerald-500'></i> Status da Homologação
+                    </h2>
+                    <span id="status-badge" class="px-3 py-1 rounded-full text-xs font-bold bg-gray-700 text-gray-300 uppercase">Não Iniciado</span>
+                </div>
+
+                <div class="relative flex items-center justify-between w-full mb-8 px-4">
+                    <div class="absolute top-1/2 left-0 w-full h-1 bg-gray-700 -translate-y-1/2 z-0"></div>
+                    <div class="relative z-10 flex flex-col items-center cursor-pointer group" onclick="openStageModal('protocolado')">
+                        <div id="step-protocolado" class="w-10 h-10 rounded-full bg-gray-800 border-2 border-gray-600 flex items-center justify-center transition-all hover:border-amber-500"><i class='bx bx-send text-gray-400'></i></div>
+                        <span class="text-[10px] font-bold text-gray-400 mt-2 uppercase tracking-wide bg-gray-900 px-1">Protocolo</span>
+                    </div>
+                    <div class="relative z-10 flex flex-col items-center cursor-pointer group" onclick="openStageModal('analise')"><div id="step-analise" class="w-10 h-10 rounded-full bg-gray-800 border-2 border-gray-600 flex items-center justify-center transition-all hover:border-amber-500"><i class='bx bx-search-alt text-gray-400'></i></div><span class="text-[10px] font-bold text-gray-400 mt-2 uppercase tracking-wide bg-gray-900 px-1">Análise</span></div>
+                    <div class="relative z-10 flex flex-col items-center cursor-pointer group" onclick="openStageModal('parecer')"><div id="step-parecer" class="w-10 h-10 rounded-full bg-gray-800 border-2 border-gray-600 flex items-center justify-center transition-all hover:border-amber-500"><i class='bx bx-file text-gray-400'></i></div><span class="text-[10px] font-bold text-gray-400 mt-2 uppercase tracking-wide bg-gray-900 px-1">Parecer</span></div>
+                    <div class="relative z-10 flex flex-col items-center cursor-pointer group" onclick="openStageModal('vistoria')"><div id="step-vistoria" class="w-10 h-10 rounded-full bg-gray-800 border-2 border-gray-600 flex items-center justify-center transition-all hover:border-amber-500"><i class='bx bx-hard-hat text-gray-400'></i></div><span class="text-[10px] font-bold text-gray-400 mt-2 uppercase tracking-wide bg-gray-900 px-1">Vistoria</span></div>
+                    <div class="relative z-10 flex flex-col items-center cursor-pointer group" onclick="openStageModal('aprovado')"><div id="step-aprovado" class="w-10 h-10 rounded-full bg-gray-800 border-2 border-gray-600 flex items-center justify-center transition-all hover:border-amber-500"><i class='bx bx-check-circle text-gray-400'></i></div><span class="text-[10px] font-bold text-gray-400 mt-2 uppercase tracking-wide bg-gray-900 px-1">Aprovado</span></div>
+
+                </div>
+
+                <div id="timeline-summary" class="bg-gray-900/50 rounded-lg p-4 border border-gray-700 text-sm text-gray-400 hidden"></div>
+
+                <dialog id="stage-modal" class="bg-transparent p-0 backdrop:bg-black/80">
+                    <div class="bg-gray-800 border border-gray-600 text-white rounded-xl shadow-2xl max-w-sm w-full p-6 animate-in fade-in zoom-in duration-300">
+                        <h3 id="modal-title" class="text-lg font-bold mb-4 text-amber-500">Atualizar Etapa</h3>
+                        <div class="space-y-4">
+                            <div><label class="block text-xs font-bold text-gray-400 uppercase mb-1">Data do Evento</label><input type="date" id="modal-date" class="modern-input w-full p-2"></div>
+                            <div><label class="block text-xs font-bold text-gray-400 uppercase mb-1">Nº Protocolo / Obs</label><input type="text" id="modal-obs" placeholder="Ex: 123456789" class="modern-input w-full p-2"></div>
+                        </div>
+                        <div class="flex gap-2 mt-6">
+                            <button type="button" onclick="document.getElementById('stage-modal').close()" class="flex-1 bg-gray-700 hover:bg-gray-600 py-2 rounded text-sm font-bold">Cancelar</button>
+                            <button type="button" onclick="saveStageData()" class="flex-1 bg-amber-600 hover:bg-amber-500 py-2 rounded text-sm font-bold text-gray-900">Salvar Avanço</button>
+                        </div>
+                        <input type="hidden" id="modal-stage-key">
+                    </div>
+                </dialog>
+            </div>
+            <div class="glass-card rounded-2xl p-8 border border-gray-700/50 shadow-xl relative overflow-hidden">
                 <div class="absolute top-0 left-0 w-1 h-full bg-amber-500"></div>
 
                 <h2 class="text-xl font-bold text-white mb-6 flex items-center gap-2">
@@ -103,6 +143,7 @@
                 </h2>
 
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
                     <div class="space-y-4">
                         <div>
                             <label class="block text-xs font-bold text-gray-400 uppercase mb-1 ml-1">Nome do Projeto</label>
@@ -153,9 +194,9 @@
                             <input type="text" id="form-endereco" placeholder="Rua, Número, Bairro, Cidade - UF" class="modern-input w-full p-3">
                         </div>
                     </div>
+
                 </div>
             </div>
-
             <div class="glass-card rounded-2xl p-8 border border-gray-700/50 shadow-xl relative overflow-hidden">
                 <div class="absolute top-0 left-0 w-1 h-full bg-blue-500"></div>
 
@@ -295,6 +336,7 @@
             document.getElementById('form-irradiation').value = data.dados_completos.irradiation || '';
             document.getElementById('form-systemLosses').value = data.dados_completos.systemLosses || '';
         }
+        renderTimeline(data.status_homologacao, data.dados_homologacao);
         loadProjectFiles(projectId);
     }
 
@@ -460,6 +502,195 @@
             }
         }
     });
+    // --- LÓGICA DA TIMELINE (HOMOLOGAÇÃO) ---
+    let timelineData = {};
+    let currentStatus = 'novo';
+
+    // Carrega dados da timeline quando abre o projeto
+    // ATENÇÃO: Adicione 'status_homologacao, dados_homologacao' no select do loadProjectDetails
+
+    function renderTimeline(status, data) {
+        currentStatus = status || 'novo';
+        timelineData = data || {};
+
+        const stages = ['protocolado', 'analise', 'parecer', 'vistoria', 'aprovado'];
+        let reachedCurrent = false;
+
+        // Atualiza Badge
+        const badge = document.getElementById('status-badge');
+        badge.textContent = currentStatus.replace('_', ' ').toUpperCase();
+
+        // Cores baseadas no status
+        if(currentStatus === 'aprovado') { badge.className = "px-3 py-1 rounded-full text-xs font-bold bg-green-500/20 text-green-400 border border-green-500/50 uppercase"; }
+        else if(currentStatus === 'novo') { badge.className = "px-3 py-1 rounded-full text-xs font-bold bg-gray-700 text-gray-300 border border-gray-600 uppercase"; }
+        else { badge.className = "px-3 py-1 rounded-full text-xs font-bold bg-amber-500/20 text-amber-400 border border-amber-500/50 uppercase"; }
+
+        // Pinta as bolinhas
+        stages.forEach((stage, index) => {
+            const el = document.getElementById(`step-${stage}`);
+            const icon = el.querySelector('i');
+
+            // Lógica simples: Se a etapa atual for maior ou igual a essa, pinta de verde/amber
+            if (stage === currentStatus) {
+                reachedCurrent = true;
+                el.className = "w-10 h-10 rounded-full bg-amber-500 border-2 border-amber-300 flex items-center justify-center shadow-[0_0_15px_rgba(245,158,11,0.5)] z-20 scale-110 transition-all";
+                icon.className = "bx bxs-check-circle text-gray-900 text-xl";
+            } else if (stages.indexOf(currentStatus) > index) {
+                // Passou
+                el.className = "w-10 h-10 rounded-full bg-green-600 border-2 border-green-400 flex items-center justify-center z-10";
+                icon.className = "bx bx-check text-white text-xl";
+            } else {
+                // Futuro
+                el.className = "w-10 h-10 rounded-full bg-gray-800 border-2 border-gray-600 flex items-center justify-center z-10 opacity-60";
+                icon.className = icon.className.replace('bxs-', 'bx-').replace('text-gray-900', 'text-gray-400'); // Reseta ícone
+            }
+        });
+
+        // Mostra Resumo se tiver dados
+        const summaryDiv = document.getElementById('timeline-summary');
+        if (Object.keys(timelineData).length > 0) {
+            summaryDiv.innerHTML = `<strong class="text-white block mb-2">Histórico:</strong>`;
+            for (const [key, value] of Object.entries(timelineData)) {
+                if(value.date) {
+                    summaryDiv.innerHTML += `
+                        <div class="flex justify-between border-b border-gray-700/50 pb-1 mb-1 last:border-0">
+                            <span class="uppercase text-xs font-bold text-gray-500 w-24">${key}</span>
+                            <span class="text-white">${new Date(value.date).toLocaleDateString('pt-BR')}</span>
+                            <span class="text-gray-400 italic text-xs truncate ml-2">${value.obs || ''}</span>
+                        </div>`;
+                }
+            }
+            summaryDiv.classList.remove('hidden');
+        }
+    }
+
+    function openStageModal(stage) {
+        document.getElementById('modal-stage-key').value = stage;
+        document.getElementById('modal-title').innerText = `Registrar: ${stage.toUpperCase()}`;
+
+        // Preenche se já tiver dados
+        if (timelineData[stage]) {
+            document.getElementById('modal-date').value = timelineData[stage].date || '';
+            document.getElementById('modal-obs').value = timelineData[stage].obs || '';
+        } else {
+            document.getElementById('modal-date').value = new Date().toISOString().split('T')[0];
+            document.getElementById('modal-obs').value = '';
+        }
+
+        document.getElementById('stage-modal').showModal();
+    }
+
+    async function saveStageData() {
+        // 1. Coleta dados do Modal
+        const stage = document.getElementById('modal-stage-key').value;
+        const date = document.getElementById('modal-date').value;
+        const obs = document.getElementById('modal-obs').value;
+
+        // 2. Atualiza o objeto local e o Visual imediatamente
+        timelineData[stage] = { date, obs };
+        renderTimeline(stage, timelineData);
+        document.getElementById('stage-modal').close();
+
+        // 3. Salva no Banco de Dados
+        if (currentProjectId) {
+            const { error } = await supabase
+                .from('calculos_salvos')
+                .update({
+                    status_homologacao: stage,
+                    dados_homologacao: timelineData
+                })
+                .eq('id', currentProjectId);
+
+            if (error) {
+                showToast("Erro ao salvar status: " + error.message, 'error');
+            } else {
+                showToast(`Status atualizado para ${stage.toUpperCase()}!`, 'success');
+
+                // --- 4. CRIA A NOTIFICAÇÃO (Aqui está a mágica) ---
+                const { data: { user } } = await supabase.auth.getUser();
+                if(user) {
+                    const nomeProj = document.getElementById('form-nome_projeto').value || 'Projeto';
+                    await supabase.from('notificacoes').insert({
+                        user_id: user.id,
+                        titulo: 'Status Atualizado',
+                        mensagem: `O projeto <strong>${nomeProj}</strong> avançou para: ${stage.toUpperCase()}`,
+                        link: `projeto-detalhes.html?id=${currentProjectId}`
+                    });
+                }
+                // --------------------------------------------------
+            }
+        }
+    }
+    // --- SISTEMA DE NOTIFICAÇÃO EM TEMPO REAL ---
+
+    // 1. Inicia o "Ouvinte" do Banco de Dados
+    document.addEventListener('DOMContentLoaded', () => {
+        // ... (seus outros códigos init) ...
+        setupRealtimeNotifications();
+    });
+
+    async function setupRealtimeNotifications() {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+
+        // Se inscreve para ouvir INSERT na tabela 'notificacoes'
+        supabase
+            .channel('notificacoes_listener')
+            .on('postgres_changes', {
+                event: 'INSERT',
+                schema: 'public',
+                table: 'notificacoes',
+                filter: `user_id=eq.${user.id}`
+            }, payload => {
+                // Quando chegar uma nova, exibe o Toast Personalizado
+                showNotificationToast(payload.new);
+            })
+            .subscribe();
+    }
+
+    // 2. O Toast com Visual de Notificação (Borda Amber + Sininho)
+    function showNotificationToast(data) {
+        let container = document.getElementById('toast-container');
+        if (!container) return; // Garante que o container existe
+
+        const el = document.createElement('div');
+
+        // Estilo visual igual ao do dropdown de notificações
+        el.className = `bg-gray-800 border-l-4 border-amber-500 text-gray-200 shadow-[0_0_20px_rgba(245,158,11,0.2)] px-6 py-4 rounded-r shadow-2xl flex items-start gap-4 min-w-[320px] max-w-[400px] toast-enter relative overflow-hidden cursor-pointer`;
+
+        // Ao clicar, vai para o link (se tiver)
+        if(data.link) {
+            el.onclick = () => window.location.href = data.link;
+        }
+
+        el.innerHTML = `
+            <div class="mt-1"><i class='bx bx-bell text-2xl text-amber-500'></i></div>
+            <div class="flex-grow">
+                <h4 class="font-bold text-sm text-amber-500 uppercase tracking-wide mb-1">${data.titulo || 'Nova Notificação'}</h4>
+                <div class="text-sm opacity-90 leading-relaxed text-gray-300">${data.mensagem}</div>
+                <span class="text-[10px] text-gray-500 mt-2 block font-mono">Agora mesmo</span>
+            </div>
+            <div class="absolute bottom-0 left-0 h-1 bg-amber-500 transition-all duration-[4000ms] ease-linear w-full"></div>
+
+            <button onclick="this.parentElement.remove()" class="absolute top-2 right-2 text-gray-600 hover:text-white"><i class='bx bx-x'></i></button>
+        `;
+
+        container.appendChild(el);
+
+        // Animação da barrinha de tempo (4 segundos)
+        setTimeout(() => {
+            const bar = el.querySelector('div.absolute.bottom-0');
+            if(bar) bar.style.width = '0%';
+        }, 50);
+
+        // Remove automático depois de 4s
+        setTimeout(() => {
+            if(el && el.parentElement) {
+                el.classList.replace('toast-enter', 'toast-exit');
+                el.addEventListener('animationend', () => el.remove());
+            }
+        }, 4000);
+    }
 </script>
 </body>
 </html>

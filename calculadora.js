@@ -438,8 +438,14 @@ function generateReportHTML(data) {
             </div>
             ${vDropHTML}
             <div class="bg-gray-800/50 rounded-lg p-6 border border-gray-700 mt-4 overflow-x-auto">
-                <h4 class="text-white font-bold mb-6 border-b border-gray-700 pb-2">Arranjo Fotovoltaico (Diagrama Unifilar)</h4>
-                <div class="flex items-stretch min-w-[600px]">
+                <div class="flex justify-between items-center mb-6 border-b border-gray-700 pb-2">
+                    <h4 class="text-white font-bold">Arranjo Fotovoltaico (Diagrama Unifilar)</h4>
+                    <button onclick="toggleStringEditor()" class="text-xs bg-gray-700 hover:bg-amber-600 text-white px-3 py-1 rounded transition flex items-center gap-1">
+                        <i class='bx bxs-edit'></i> Personalizar
+                    </button>
+                </div>
+                <div id="string-editor" class="hidden mb-6 bg-gray-900 p-4 rounded border border-gray-600"></div>
+                <div id="visual-strings-container" class="flex items-stretch min-w-[600px]">
                     <div class="flex-grow space-y-6 flex flex-col justify-center py-4">
                         ${generateVisualStrings(distribution)}
                     </div>
@@ -832,4 +838,107 @@ async function generatePdf() {
         btn.disabled = false;
         btn.innerHTML = originalText;
     }
+}
+// --- FUNÇÕES DE EDIÇÃO MANUAL DE STRINGS (O PULO DO GATO) ---
+
+function toggleStringEditor() {
+    const editor = document.getElementById('string-editor');
+    const visual = document.getElementById('visual-strings-container');
+
+    if (!editor.classList.contains('hidden')) {
+        editor.classList.add('hidden');
+        visual.classList.remove('opacity-50', 'pointer-events-none');
+        return;
+    }
+
+    // Renderizar os inputs baseado na distribuição atual
+    const dist = lastCalculatedResults.distribution;
+    const inputs = lastCalculatedResults.inputs;
+
+    let html = `
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div class="col-span-1 md:col-span-2 text-sm text-gray-400 mb-2">
+                <i class='bx bxs-info-circle text-amber-500'></i> 
+                Distribua os <strong>${inputs.moduleCount}</strong> módulos manualmente. O sistema validará tensão e corrente.
+            </div>`;
+
+    // Cria inputs para cada MPPT
+    for (let i = 0; i < inputs.mpptCount; i++) {
+        const d = dist[i] || { numStrings: 0, modulesPerString: 0 };
+        html += `
+        <div class="bg-gray-800 p-3 rounded border border-gray-700">
+            <strong class="text-amber-500 block mb-2 text-sm">MPPT ${i + 1}</strong>
+            <div class="flex gap-2">
+                <div>
+                    <label class="text-[10px] text-gray-400">Strings</label>
+                    <input type="number" id="manual_str_${i}" value="${d.numStrings}" class="w-full bg-gray-900 border border-gray-600 text-white rounded px-2 py-1 text-sm focus:border-amber-500 outline-none">
+                </div>
+                <div>
+                    <label class="text-[10px] text-gray-400">Módulos/String</label>
+                    <input type="number" id="manual_mod_${i}" value="${d.modulesPerString}" class="w-full bg-gray-900 border border-gray-600 text-white rounded px-2 py-1 text-sm focus:border-amber-500 outline-none">
+                </div>
+            </div>
+        </div>`;
+    }
+
+    html += `</div>
+        <div class="flex gap-2 justify-end">
+            <button onclick="toggleStringEditor()" class="text-sm text-gray-400 hover:text-white px-3 py-1">Cancelar</button>
+            <button onclick="applyManualStringConfig()" class="bg-green-600 hover:bg-green-500 text-white text-sm font-bold px-4 py-2 rounded shadow flex items-center gap-2">
+                <i class='bx bx-check'></i> Aplicar Alteração
+            </button>
+        </div>`;
+
+    editor.innerHTML = html;
+    editor.classList.remove('hidden');
+    visual.classList.add('opacity-50', 'pointer-events-none'); // Ofusca o visual enquanto edita
+}
+
+function applyManualStringConfig() {
+    const inputs = lastCalculatedResults.inputs;
+    const newDistribution = [];
+    let totalModulesUsed = 0;
+    let electricalError = null;
+    let maxV = 0;
+
+    // 1. Coleta e Validação Básica
+    for (let i = 0; i < inputs.mpptCount; i++) {
+        const numS = parseInt(document.getElementById(`manual_str_${i}`).value) || 0;
+        const modS = parseInt(document.getElementById(`manual_mod_${i}`).value) || 0;
+
+        // Validações Elétricas
+        const vocString = modS * lastCalculatedResults.vocCorrected;
+        const iscTotal = numS * inputs.moduleIsc;
+
+        if (vocString > inputs.inverterMaxV) electricalError = `Tensão excessiva na MPPT ${i+1} (${vocString.toFixed(1)}V > ${inputs.inverterMaxV}V)`;
+        if (iscTotal > inputs.mpptMaxA) electricalError = `Corrente excessiva na MPPT ${i+1} (${iscTotal.toFixed(1)}A > ${inputs.mpptMaxA}A)`;
+
+        if (vocString > maxV) maxV = vocString;
+
+        totalModulesUsed += (numS * modS);
+        newDistribution.push({ numStrings: numS, modulesPerString: modS });
+    }
+
+    // 2. Erros de Bloqueio
+    if (electricalError) {
+        showToast(electricalError, 'error');
+        return;
+    }
+
+    if (totalModulesUsed !== inputs.moduleCount) {
+        showToast(`Quantidade de módulos incorreta! Você usou ${totalModulesUsed}, mas o projeto tem ${inputs.moduleCount}.`, 'error');
+        return;
+    }
+
+    // 3. Sucesso: Atualiza o objeto global e re-renderiza a tela
+    lastCalculatedResults.distribution = newDistribution;
+    lastCalculatedResults.maxVStringGlobal = maxV;
+
+    // Atualiza HTML
+    document.getElementById('results').innerHTML = generateReportHTML(lastCalculatedResults);
+
+    // Atualiza Gráficos
+    createGenerationChart(lastCalculatedResults.monthlyGeneration, lastCalculatedResults.totalAnnualGeneration);
+
+    showToast("Arranjo personalizado aplicado com sucesso!", "success");
 }

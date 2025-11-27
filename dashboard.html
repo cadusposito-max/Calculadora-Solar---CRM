@@ -21,6 +21,22 @@
             <span class="text-2xl font-bold text-white">Calculadora Solar</span>
         </a>
         <div class="flex items-center space-x-4">
+            <div class="relative">
+                <button id="notif-btn" onclick="toggleNotifPanel()" class="relative p-2 text-gray-400 hover:text-white transition">
+                    <i class='bx bx-bell text-xl'></i>
+                    <span id="notif-badge" class="absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-gray-900 hidden"></span>
+                </button>
+
+                <div id="notif-panel" class="hidden absolute right-0 mt-2 w-80 bg-gray-800 border border-gray-700 rounded-xl shadow-2xl z-50 overflow-hidden">
+                    <div class="p-3 border-b border-gray-700 flex justify-between items-center bg-gray-900/50">
+                        <h4 class="text-sm font-bold text-white">Notificações</h4>
+                        <button onclick="markAllRead()" class="text-[10px] text-amber-500 hover:underline">Marcar lidas</button>
+                    </div>
+                    <div id="notif-list" class="max-h-64 overflow-y-auto custom-scrollbar">
+                        <p class="text-center text-xs text-gray-500 py-4">Nenhuma notificação.</p>
+                    </div>
+                </div>
+            </div>
             <a href="perfil.html" class="flex items-center gap-3 hover:bg-gray-700/50 p-2 rounded-lg transition-colors">
                 <div class="text-right hidden sm:block">
                     <span id="header-username" class="font-bold text-white text-sm">Carregando...</span>
@@ -110,7 +126,38 @@
                         <div class="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-purple-600 to-purple-400"></div>
                         <i class='bx bx-bar-chart-alt-2 card-icon-bg text-purple-500'></i>
                     </div>
+                </div> <div class="mb-8">
+                <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wide mb-4 flex items-center gap-2">
+                    <i class='bx bx-git-branch text-amber-500'></i> Funil de Homologação
+                </h3>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+
+                    <div class="bg-gray-800/50 rounded-xl p-4 border border-gray-700 relative overflow-hidden">
+                        <p class="text-xs text-gray-500 mb-1">Em Análise</p>
+                        <h4 id="status-analise" class="text-2xl font-bold text-white">0</h4>
+                        <div class="absolute right-2 bottom-2 text-blue-500/20 text-4xl"><i class='bx bx-search-alt'></i></div>
+                    </div>
+
+                    <div class="bg-gray-800/50 rounded-xl p-4 border border-gray-700 relative overflow-hidden">
+                        <p class="text-xs text-gray-500 mb-1">Parecer Emitido</p>
+                        <h4 id="status-parecer" class="text-2xl font-bold text-white">0</h4>
+                        <div class="absolute right-2 bottom-2 text-yellow-500/20 text-4xl"><i class='bx bx-file'></i></div>
+                    </div>
+
+                    <div class="bg-gray-800/50 rounded-xl p-4 border border-gray-700 relative overflow-hidden">
+                        <p class="text-xs text-gray-500 mb-1">Aguard. Vistoria</p>
+                        <h4 id="status-vistoria" class="text-2xl font-bold text-white">0</h4>
+                        <div class="absolute right-2 bottom-2 text-purple-500/20 text-4xl"><i class='bx bx-hard-hat'></i></div>
+                    </div>
+
+                    <div class="bg-gray-800/50 rounded-xl p-4 border border-green-900/30 relative overflow-hidden">
+                        <p class="text-xs text-gray-500 mb-1">Conectados</p>
+                        <h4 id="status-aprovado" class="text-2xl font-bold text-green-400">0</h4>
+                        <div class="absolute right-2 bottom-2 text-green-500/20 text-4xl"><i class='bx bx-check-circle'></i></div>
+                    </div>
+
                 </div>
+            </div>
 
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
