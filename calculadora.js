@@ -339,7 +339,24 @@ function calculate() {
         resultsDiv.innerHTML = `<div class="p-4 bg-red-900/70 text-red-300 rounded-lg font-bold">${electricalError}</div>`;
         resultsDiv.classList.remove('hidden'); return;
     }
+    const currentOverloadPercent = ((inputs.moduleCount * inputs.modulePower) / inputs.inverterPower) * 100;
+    const maxAllowedOverload = 100 + inputs.overload;
 
+    if (currentOverloadPercent > maxAllowedOverload) {
+        hideResults();
+        // Exibe erro na tela igual ao erro elétrico
+        resultsDiv.innerHTML = `
+            <div class="p-4 bg-red-900/70 text-red-300 rounded-lg border border-red-700 shadow-lg">
+                <div class="flex items-center gap-3 mb-1">
+                    <i class='bx bxs-error-alt text-2xl'></i>
+                    <strong class="text-lg">Erro: Overload Excessivo!</strong>
+                </div>
+                <p>O dimensionamento resultou em <strong>${currentOverloadPercent.toFixed(1)}%</strong> de overload.</p>
+                <p class="text-sm opacity-80 mt-1">O limite configurado no inversor é <strong>${maxAllowedOverload}%</strong> (Overload de ${inputs.overload}%).</p>
+            </div>`;
+        resultsDiv.classList.remove('hidden');
+        return; // Para a execução aqui
+    }
     const systemDcPowerKw = (inputs.moduleCount * inputs.modulePower) / 1000;
     const powerRatioPercent = ((modulesPerInverter * inputs.modulePower) / inputs.inverterPower) * 100;
     const daysInMonth = [31, 28.25, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
@@ -375,7 +392,7 @@ function generateReportHTML(data) {
     const nominalCurrent = inputs.inverterPower / (isThreePhase ? voltage * 1.732 : voltage);
     const projectCurrent = nominalCurrent * 1.25;
 
-    const breakers = [10, 16, 20, 25, 32, 40, 50, 63, 70, 80, 100, 125, 150, 175, 200, 225, 250];
+    const breakers = [16, 25, 32, 40, 50, 63, 70, 80, 100, 125, 150, 175, 200, 250];
     const breaker = breakers.find(b => b >= projectCurrent) || 250;
 
     let cable = "Consulte";
